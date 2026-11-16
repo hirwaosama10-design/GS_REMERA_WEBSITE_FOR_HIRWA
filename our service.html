@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G.S Remera TSS - Our Services</title>
+<link rel="icon" type="image/png" href="2.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+     font-family: Algerian, serif;
+    background: rgb(69, 53, 53);
+    min-height: 100vh;
+}
+
+/* HEADER */
+header {
+    background: rgb(5, 203, 238);
+    font-family: Algerian, serif;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+header img {
+    height: 80px;
+    object-fit: contain;
+}
+
+@media (max-width: 768px) {
+    header img { height: 50px; }
+    header div { font-size: 18px !important; }
+}
+
+/* NAV */
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: 0.3s;
+}
+
+   nav a:hover {    color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+
+    nav a.active {
+        color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+    color: white;
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.page-header h1 {
+    font-size: 42px;
+    margin-bottom: 15px;
+}
+
+.page-header p {
+    font-size: 18px;
+    opacity: 0.95;
+}
+
+/* Services Container */
+.services-container {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+/* Service Categories */
+.service-category {
+    margin-bottom: 50px;
+}
+
+.category-title {
+    text-align: center;
+    color: #0055aa;
+    font-size: 28px;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.category-title::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 3px;
+    background: rgb(5, 203, 238);
+    margin: 15px auto 0;
+    border-radius: 2px;
+}
+
+/* Services Grid */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.service-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.service-icon {
+    background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+    padding: 30px;
+    text-align: center;
+}
+
+.service-icon i {
+    font-size: 50px;
+    color: white;
+}
+
+.service-content {
+    padding: 25px;
+}
+
+.service-title {
+    color: #0055aa;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.service-description {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.service-features {
+    list-style: none;
+    margin: 15px 0;
+}
+
+.service-features li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    color: #555;
+    font-size: 14px;
+}
+
+.service-features li i {
+    color: #0055aa;
+    margin-right: 10px;
+    width: 20px;
+}
+
+.service-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #0055aa;
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: bold;
+    transition: 0.3s;
+    margin-top: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.service-btn:hover {
+    background: rgb(5, 203, 238);
+    transform: scale(1.05);
+}
+
+/* Why Choose Us Section */
+.why-choose-us {
+    background: #f0f2f5;
+    padding: 60px 20px;
+    margin: 40px 0;
+}
+
+.why-choose-us h2 {
+    text-align: center;
+    color: #0055aa;
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.why-card {
+    text-align: center;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    transition: 0.3s;
+}
+
+.why-card:hover {
+    transform: translateY(-5px);
+}
+
+.why-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.why-icon i {
+    font-size: 30px;
+    color: white;
+}
+
+.why-card h3 {
+    color: #0055aa;
+    margin-bottom: 10px;
+}
+
+.why-card p {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Pricing Section */
+.pricing-section {
+    padding: 60px 20px;
+}
+
+.pricing-section h2 {
+    text-align: center;
+    color: #0055aa;
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.pricing-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    text-align: center;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.pricing-card:hover {
+    transform: translateY(-5px);
+}
+
+.pricing-header {
+    background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+    color: white;
+    padding: 30px;
+}
+
+.pricing-header h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.pricing-price {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.pricing-price span {
+    font-size: 14px;
+}
+
+.pricing-features {
+    padding: 30px;
+}
+
+.pricing-features ul {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.pricing-features li {
+    padding: 8px 0;
+    color: #555;
+    border-bottom: 1px solid #eee;
+}
+
+.pricing-features li i {
+    color: #28a745;
+    margin-right: 10px;
+}
+
+.pricing-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background: #0055aa;
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.pricing-btn:hover {
+    background: rgb(5, 203, 238);
+}
+
+/* Testimonials */
+.testimonials-section {
+    background: #f0f2f5;
+    padding: 60px 20px;
+    margin: 40px 0;
+}
+
+.testimonials-section h2 {
+    text-align: center;
+    color: #0055aa;
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.testimonial-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+}
+
+.testimonial-avatar {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+}
+
+.testimonial-avatar i {
+    font-size: 30px;
+    color: white;
+}
+
+.testimonial-text {
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+.testimonial-name {
+    font-weight: bold;
+    color: #0055aa;
+    margin-bottom: 5px;
+}
+
+.testimonial-role {
+    font-size: 12px;
+    color: #888;
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+    color: white;
+    text-align: center;
+    padding: 60px 20px;
+    border-radius: 15px;
+    margin: 40px 0;
+}
+
+.cta-section h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.cta-section p {
+    margin-bottom: 25px;
+    font-size: 18px;
+}
+
+.cta-btn {
+    display: inline-block;
+    padding: 15px 40px;
+    background: white;
+    color: #0055aa;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+.cta-btn:hover {
+    transform: scale(1.05);
+    background: #f0f2f5;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+    color: white;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.modal-header h2 i {
+    margin-right: 10px;
+}
+
+.close-modal {
+    font-size: 32px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.close-modal:hover {
+    transform: scale(1.2);
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.modal-section {
+    margin-bottom: 25px;
+}
+
+.modal-section h3 {
+    color: #0055aa;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.modal-section p {
+    color: #555;
+    line-height: 1.6;
+}
+
+.modal-features {
+    list-style: none;
+    margin: 15px 0;
+}
+
+.modal-features li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    color: #555;
+}
+
+.modal-features li i {
+    color: #28a745;
+    margin-right: 10px;
+}
+
+.modal-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.stat-badge {
+    background: #f0f2f5;
+    padding: 10px 15px;
+    border-radius: 10px;
+    text-align: center;
+    flex: 1;
+}
+
+.stat-badge .number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0055aa;
+}
+
+.stat-badge .label {
+    font-size: 12px;
+    color: #666;
+}
+
+.modal-footer {
+    padding: 20px 30px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.modal-btn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.modal-btn-primary {
+    background: #0055aa;
+    color: white;
+}
+
+.modal-btn-primary:hover {
+    background: rgb(5, 203, 238);
+}
+
+.modal-btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-btn-secondary:hover {
+    background: #5a6268;
+}
+
+  /* Admin Link Button in Footer */
+    .admin-footer-btn {
+        display: inline-block;
+        background: rgb(5, 203, 238);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s;
+        margin-top: 15px;
+        border: none;
+    }
+
+    .admin-footer-btn:hover {
+        background: white;
+        color: rgb(5, 203, 238);
+        transform: scale(1.05);
+    }
+
+/* Footer */
+footer {
+    background: rgb(5, 203, 238);
+    color: white;
+    padding: 40px 20px;
+    margin-top: 40px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 180px;
+}
+
+.footer-section h3 {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.footer-section a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.footer-section a:hover {
+    text-decoration: underline;
+}
+
+.social-icons {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.icon {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+.fb { background: #1877f2; }
+.yt { background: #ff0000; }
+.tt { background: #000000; }
+.ig { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); }
+
+.icon:hover {
+    transform: scale(1.1);
+}
+
+hr {
+    margin: 20px 0;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.copyright {
+    text-align: center;
+    font-size: 12px;
+}
+
+@media (max-width: 768px) {
+    .page-header h1 { font-size: 32px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .why-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .footer-content { flex-direction: column; text-align: center; }
+    .social-icons { justify-content: center; }
+    .modal-stats { flex-direction: column; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <a href="Home.html">
+        <img src="2.png" alt="Logo" height="80">
+    </a>
+
+<nav>
+    <a href="Home.html">Home</a>
+    <a href="department.html">Department</a>
+     <a href="about.html">About</a>
+    <a href="stakeholder.html">Stakeholders</a>
+    <a href="Accounting.html">Accounting</a>
+    <a href="Marks Portal.html">Marks Portal</a>
+    <a href="event.html">Events</a>
+    <a href="contact.html">Contact</a>
+</nav>
+</header>
+
+<div class="page-header">
+    <h1><i class="fa fa-cogs"></i> Our Services</h1>
+    <p>Comprehensive educational services for a brighter future</p>
+</div>
+
+<div class="services-container">
+    <!-- Academic Services -->
+    <div class="service-category">
+        <h2 class="category-title"><i class="fa fa-graduation-cap"></i> Academic Services</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon"><i class="fa fa-chalkboard-user"></i></div>
+                <div class="service-content">
+                    <h3 class="service-title">Quality Teaching</h3>
+                    <p class="service-description">Professional teachers delivering quality education using modern teaching methodologies.</p>
+                    <ul class="service-features">
+                        <li><i class="fa fa-check-circle"></i> Qualified and experienced teachers</li>
+                        <li><i class="fa fa-check-circle"></i> Student-centered learning approach</li>
+                        <li><i class="fa fa-check-circle"></i> Regular assessments and feedback</li>
+                        <li><i class="fa fa-check-circle"></i> Individual attention to students</li>
+                    </ul>
+                    <button class="service-btn" onclick="showServiceDetails('teaching')">Learn More <i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fa fa-flask"></i></div>
+                <div class="service-content">
+                    <h3 class="service-title">Science Laboratories</h3>
+                    <p class="service-description">Well-equipped laboratories for practical learning in Physics, Chemistry, and Biology.</p>
+                    <ul class="service-features">
+                        <li><i class="fa fa-check-circle"></i> Modern laboratory equipment</li>
+                        <li><i class="fa fa-check-circle"></i> Hands-on practical sessions</li>
+                        <li><i class="fa fa-check-circle"></i> Safety-compliant facilities</li>
+                        <li><i class="fa fa-check-circle"></i> Experienced lab technicians</li>
+                    </ul>
+                    <button class="service-btn" onclick="showServiceDetails('labs')">Learn More <i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fa fa-laptop-code"></i></div>
+                <div class="service-content">
+                    <h3 class="service-title">ICT & Computer Labs</h3>
+                    <p class="service-description">State-of-the-art computer laboratories for digital literacy and ICT skills.</p>
+                    <ul class="service-features">
+                        <li><i class="fa fa-check-circle"></i> 120+ modern computers</li>
+                        <li><i class="fa fa-check-circle"></i> High-speed internet access</li>
+                        <li><i class="fa fa-check-circle"></i> Computer programming courses</li>
+                        <li><i class="fa fa-check-circle"></i> Digital skills training</li>
+                    </ul>
+                    <button class="service-btn" onclick="showServiceDetails('ict')">Learn More <i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Support Services -->
+    <div class="service-category">
+        <h2 class="category-title"><i class="fa fa-handshake"></i> Student Support Services</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon"><i class="fa fa-book"></i></div>
+                <div class="service-content">
+                    <h3 class="service-title">Library Services</h3>
+                    <p class="service-description">Well-stocked library with books, journals, and digital resources for research.</p>
+                    <ul class="service-features">
+                        <li><i class="fa fa-check-circle"></i> 5,000+ books and resources</li>
+                        <li><i class="fa fa-check-circle"></i> Quiet study areas</li>
+                        <li><i class="fa fa-check-circle"></i> Digital library access</li>
+                        <li><i class="fa fa-check-circle"></i> Reference services</li>
+                    </ul>
+                    <button class="service-btn" onclick="showServiceDetails('library')">Learn More <i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fa fa-bus"></i></div>
+                <div class="service-content">
+                    <h3 class="service-title">Transport Services</h3>
+                    <p class="service-description">Safe and reliable transportation for students from surrounding areas.</p>
+                    <ul class="service-features">
+                        <li><i class="fa fa-check-circle"></i> School bus fleet</li>
+                        <li><i class="fa fa-check-circle"></i> Trained drivers</li>
+                        <li><i class="fa fa-check-circle"></i> Safe pickup and drop-off</li>
+                        <li><i class="fa fa-check-circle"></i> Affordable fees</li>
+                    </ul>
+                    <button class="service-btn" onclick="showServiceDetails('transport')">Learn More <i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fa fa-heartbeat"></i></div>
+                <div class="service-content">
+                    <h3 class="service-title">Health Services</h3>
+                    <p class="service-description">School clinic providing basic health care and first aid services.</p>
+                    <ul class="service-features">
+                        <li><i class="fa fa-check-circle"></i> On-site school clinic</li>
+                        <li><i class="fa fa-check-circle"></i> Regular health checkups</li>
+                        <li><i class="fa fa-check-circle"></i> Health education programs</li>
+                        <li><i class="fa fa-check-circle"></i> Emergency response ready</li>
+                    </ul>
+                    <button class="service-btn" onclick="showServiceDetails('health')">Learn More <i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extracurricular Services -->
+    <div class="service-category">
+        <h2 class="category-title"><i class="fa fa-futbol"></i> Extracurricular Services</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon"><i class="fa fa-futbol"></i></div>
+                <div class="service-content">
+                    <h3 class="service-title">Sports Programs</h3>
+                    <p class="service-description">Various sports activities to promote physical fitness and teamwork.</p>
+                    <ul class="service-features">
+                        <li><i class="fa fa-check-circle"></i> Football, basketball, volleyball</li>
+                        <li><i class="fa fa-check-circle"></i> Athletics and track events</li>
+                        <li><i class="fa fa-check-circle"></i> Regular tournaments</li>
+                        <li><i class="fa fa-check-circle"></i> Professional coaches</li>
+                    </ul>
+                    <button class="service-btn" onclick="showServiceDetails('sports')">Learn More <i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fa fa-music"></i></div>
+                <div class="service-content">
+                    <h3 class="service-title">Arts & Culture</h3>
+                    <p class="service-description">Programs to nurture creativity and cultural appreciation.</p>
+                    <ul class="service-features">
+                        <li><i class="fa fa-check-circle"></i> Music and dance classes</li>
+                        <li><i class="fa fa-check-circle"></i> Drama and theater</li>
+                        <li><i class="fa fa-check-circle"></i> Art and craft workshops</li>
+                        <li><i class="fa fa-check-circle"></i> Cultural events</li>
+                    </ul>
+                    <button class="service-btn" onclick="showServiceDetails('arts')">Learn More <i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon"><i class="fa fa-users"></i></div>
+                <div class="service-content">
+                    <h3 class="service-title">Clubs & Societies</h3>
+                    <p class="service-description">Various clubs for student interests and leadership development.</p>
+                    <ul class="service-features">
+                        <li><i class="fa fa-check-circle"></i> Debate and public speaking club</li>
+                        <li><i class="fa fa-check-circle"></i> Science and innovation club</li>
+                        <li><i class="fa fa-check-circle"></i> Environmental club</li>
+                        <li><i class="fa fa-check-circle"></i> Entrepreneurship club</li>
+                    </ul>
+                    <button class="service-btn" onclick="showServiceDetails('clubs')">Learn More <i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Choose Us Section -->
+    <div class="why-choose-us">
+        <h2><i class="fa fa-star"></i> Why Choose G.S Remera TSS?</h2>
+        <div class="why-grid">
+            <div class="why-card">
+                <div class="why-icon"><i class="fa fa-medal"></i></div>
+                <h3>Excellence Track Record</h3>
+                <p>Consistently high pass rates and outstanding academic achievements (95% pass rate in 2025).</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon"><i class="fa fa-users"></i></div>
+                <h3>Qualified Staff</h3>
+                <p>50+ experienced, dedicated, and continuously trained teaching staff members.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon"><i class="fa fa-building"></i></div>
+                <h3>Modern Facilities</h3>
+                <p>Well-equipped classrooms, 4 science labs, 120+ computers, and library.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon"><i class="fa fa-hand-holding-heart"></i></div>
+                <h3>Holistic Development</h3>
+                <p>Focus on academic, social, and personal growth of students through various activities.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Section -->
+    <div class="pricing-section">
+        <h2><i class="fa fa-tags"></i> Fee Structure</h2>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3>Nursery & Primary</h3>
+                    <div class="pricing-price">45,000 RWF<span>/term</span></div>
+                </div>
+                <div class="pricing-features">
+                    <ul>
+                        <li><i class="fa fa-check"></i> Qualified teachers</li>
+                        <li><i class="fa fa-check"></i> Learning materials included</li>
+                        <li><i class="fa fa-check"></i> Play-based learning</li>
+                        <li><i class="fa fa-check"></i> Safe environment</li>
+                    </ul>
+                    <a href="contact.html" class="pricing-btn">Enroll Now</a>
+                </div>
+            </div>
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3>General Secondary</h3>
+                    <div class="pricing-price">75,000 RWF<span>/term</span></div>
+                </div>
+                <div class="pricing-features">
+                    <ul>
+                        <li><i class="fa fa-check"></i> All academic subjects</li>
+                        <li><i class="fa fa-check"></i> Laboratory access</li>
+                        <li><i class="fa fa-check"></i> Library access</li>
+                        <li><i class="fa fa-check"></i> Sports activities</li>
+                    </ul>
+                    <a href="contact.html" class="pricing-btn">Enroll Now</a>
+                </div>
+            </div>
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3>Technical Secondary</h3>
+                    <div class="pricing-price">85,000 RWF<span>/term</span></div>
+                </div>
+                <div class="pricing-features">
+                    <ul>
+                        <li><i class="fa fa-check"></i> Technical/vocational training</li>
+                        <li><i class="fa fa-check"></i> Workshop access</li>
+                        <li><i class="fa fa-check"></i> Internship opportunities</li>
+                        <li><i class="fa fa-check"></i> Professional certification</li>
+                    </ul>
+                    <a href="contact.html" class="pricing-btn">Enroll Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials Section -->
+    <div class="testimonials-section">
+        <h2><i class="fa fa-comments"></i> What People Say</h2>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-avatar"><i class="fa fa-user-tie"></i></div>
+                <p class="testimonial-text">"G.S Remera TSS transformed my child's future. The teachers are dedicated and the facilities are excellent."</p>
+                <div class="testimonial-name">Mr. Habimana</div>
+                <div class="testimonial-role">Parent</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-avatar"><i class="fa fa-user-graduate"></i></div>
+                <p class="testimonial-text">"I graduated with excellent grades thanks to the support I received. The school prepared me well for university."</p>
+                <div class="testimonial-name">Student Alumni</div>
+                <div class="testimonial-role">Class of 2024</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-avatar"><i class="fa fa-chalkboard"></i></div>
+                <p class="testimonial-text">"A great learning environment with modern facilities and supportive administration. Proud to be part of this school."</p>
+                <div class="testimonial-name">Mrs. Uwase</div>
+                <div class="testimonial-role">Teacher</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta-section">
+        <h2>Ready to Join G.S Remera TSS?</h2>
+        <p>Enroll your child today for quality education and a brighter future.</p>
+        <a href="contact.html" class="cta-btn"><i class="fa fa-envelope"></i> Contact Us Now</a>
+    </div>
+</div>
+
+<!-- Modal for Service Details -->
+<div id="serviceModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle"><i class="fa fa-info-circle"></i> Service Details</h2>
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Dynamic content will be loaded here -->
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-primary" onclick="closeModal()">Close</button>
+            <a href="contact.html" class="modal-btn modal-btn-primary" id="contactBtn" style="text-decoration: none;">Contact Us</a>
+        </div>
+    </div>
+</div>
+
+
+
+<footer>
+    <div class="footer-content">
+        <!-- Logo Section -->
+        <div class="footer-section">
+            <a href="home.html">
+                <img src="2.png" alt="Logo" height="200">
+            </a>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="Home.html">Home</a></p>
+            <p><a href="department.html">Department</a></p>
+            <p><a href="stakeholder.html">Stakeholders</a></p>
+            <p><a href="event.html">Events</a></p>
+            <p><a href="contact.html">Contact</a></p>
+            <p><a href="organisation.html">Organization</a></p>
+        </div>
+
+        <!-- Contact Us -->
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fa fa-envelope"></i> busoro1972@gmail.com</p>
+            <p><i class="fa fa-phone"></i> +250782160168</p>
+            <p><i class="fa fa-map-marker-alt"></i> G.S Remera TSS, Rulindo</p>
+            <p><i class="fa fa-clock"></i> Mon-Fri: 7:30 AM - 5:00 PM</p>
+        </div>
+
+        <!-- Follow Us -->
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="https://www.facebook.com/profile.php?id=61587210833693" class="icon fb"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.youtube.com/watch?v=YRhBfL3GEjQ" class="icon yt"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.tiktok.com/@osamathelegend4" class="icon tt"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/hirwaosama10/" class="icon ig"><i class="fab fa-instagram"></i></a>
+            </div>
+             <!-- Admin Panel Button in Footer (NOT fixed) -->
+            <a href="admin.html" class="admin-footer-btn">
+                <i class="fa fa-shield-alt"></i> Admin Dashboard
+            </a>
+        </div>
+
+        <!-- Location -->
+        <div class="footer-section">
+            <h3>Location</h3>
+            <iframe 
+                src="https://www.google.com/maps?q=G.S+REMERA+TSS+Rulindo+Cyinzuzi&output=embed"
+                allowfullscreen=""
+                loading="lazy" 
+                style="width: 200px; height: 150px; border: 0; border-radius: 8px;">
+            </iframe>
+        </div>
+    </div>
+    <hr>
+    <div class="copyright">
+        <p>Copyright © 2026 G.S Remera TSS | All Rights Reserved</p>
+        <p style="margin-top: 5px;">Education for Development</p>
+    </div>
+</footer>
+
+<script>
+    // Service details data
+    const serviceDetails = {
+        teaching: {
+            title: "Quality Teaching Service",
+            icon: "fa-chalkboard-user",
+            description: "Our teaching service provides high-quality education through experienced and dedicated teachers who use modern teaching methodologies to ensure every student succeeds.",
+            fullDescription: "At G.S Remera TSS, we believe that quality teaching is the foundation of excellent education. Our teachers are carefully selected, continuously trained, and committed to student success.",
+            features: [
+                "50+ qualified and experienced teachers",
+                "Student-centered learning approach",
+                "Regular assessments and progress tracking",
+                "Individual attention to each student",
+                "Modern teaching methodologies",
+                "Continuous professional development for teachers"
+            ],
+            stats: [
+                { number: "50+", label: "Qualified Teachers" },
+                { number: "95%", label: "Student Satisfaction" },
+                { number: "15:1", label: "Student-Teacher Ratio" }
+            ],
+            contact: "For teaching inquiries, contact the Academic Director"
+        },
+        labs: {
+            title: "Science Laboratories",
+            icon: "fa-flask",
+            description: "Our science laboratories are fully equipped with modern apparatus for practical learning in Physics, Chemistry, and Biology.",
+            fullDescription: "The science laboratories at G.S Remera TSS are designed to provide hands-on learning experiences that complement theoretical knowledge. Students conduct experiments under the guidance of experienced lab technicians.",
+            features: [
+                "4 fully equipped laboratories",
+                "Modern apparatus and equipment",
+                "Safety-compliant facilities",
+                "Experienced lab technicians",
+                "Regular practical sessions",
+                "Preparation for national exams"
+            ],
+            stats: [
+                { number: "4", label: "Science Labs" },
+                { number: "100%", label: "Safety Compliant" },
+                { number: "500+", label: "Students Served" }
+            ],
+            contact: "For lab inquiries, contact the Science Department Head"
+        },
+        ict: {
+            title: "ICT & Computer Labs",
+            icon: "fa-laptop-code",
+            description: "Our computer laboratories are equipped with modern computers and high-speed internet for digital literacy and ICT skills development.",
+            fullDescription: "The ICT department provides students with essential digital skills for the modern world. Our computer labs are equipped with the latest technology and software for comprehensive ICT education.",
+            features: [
+                "120+ modern computers",
+                "High-speed internet access",
+                "Computer programming courses",
+                "Digital skills training",
+                "ICT certification preparation",
+                "Online learning resources"
+            ],
+            stats: [
+                { number: "120+", label: "Computers" },
+                { number: "24/7", label: "Internet Access" },
+                { number: "6", label: "ICT Programs" }
+            ],
+            contact: "For ICT inquiries, contact the ICT Department"
+        },
+        library: {
+            title: "Library Services",
+            icon: "fa-book",
+            description: "Our library offers a vast collection of books, journals, and digital resources to support research and learning.",
+            fullDescription: "The school library is a hub of knowledge with thousands of books across various subjects. Students have access to both physical and digital resources for their academic needs.",
+            features: [
+                "5,000+ books and resources",
+                "Quiet study areas",
+                "Digital library access",
+                "Reference services",
+                "Reading programs",
+                "Research assistance"
+            ],
+            stats: [
+                { number: "5,000+", label: "Books" },
+                { number: "100+", label: "Digital Resources" },
+                { number: "200", label: "Daily Visitors" }
+            ],
+            contact: "For library inquiries, contact the Librarian"
+        },
+        transport: {
+            title: "Transport Services",
+            icon: "fa-bus",
+            description: "Safe and reliable transportation for students from surrounding areas with trained drivers and well-maintained buses.",
+            fullDescription: "Our transport service ensures students arrive at school safely and on time. We cover multiple routes across Rulindo District with modern, well-maintained buses.",
+            features: [
+                "Modern school bus fleet",
+                "Trained and licensed drivers",
+                "Safe pickup and drop-off points",
+                "Affordable transport fees",
+                "GPS tracking on buses",
+                "Emergency response ready"
+            ],
+            stats: [
+                { number: "5", label: "School Buses" },
+                { number: "10+", label: "Routes Covered" },
+                { number: "300+", label: "Students Served" }
+            ],
+            contact: "For transport inquiries, contact the Transport Coordinator"
+        },
+        health: {
+            title: "Health Services",
+            icon: "fa-heartbeat",
+            description: "On-site school clinic providing basic health care, first aid, and health education for students and staff.",
+            fullDescription: "Student health and well-being are our priority. Our school clinic is staffed by qualified nurses who provide immediate care for illnesses and injuries, plus health education programs.",
+            features: [
+                "On-site school clinic",
+                "Qualified nurses",
+                "Regular health checkups",
+                "Health education programs",
+                "First aid training",
+                "Emergency response system"
+            ],
+            stats: [
+                { number: "24/7", label: "Emergency Care" },
+                { number: "100%", label: "Health Coverage" },
+                { number: "4", label: "Health Staff" }
+            ],
+            contact: "For health inquiries, contact the School Nurse"
+        },
+        sports: {
+            title: "Sports Programs",
+            icon: "fa-futbol",
+            description: "Comprehensive sports programs promoting physical fitness, teamwork, and healthy competition among students.",
+            fullDescription: "Sports are an integral part of student development at G.S Remera TSS. We offer various sports with professional coaching and regular competitions.",
+            features: [
+                "Football, basketball, volleyball",
+                "Athletics and track events",
+                "Regular tournaments",
+                "Professional coaches",
+                "Sports facilities",
+                "Annual sports day"
+            ],
+            stats: [
+                { number: "8", label: "Sports Teams" },
+                { number: "200+", label: "Active Athletes" },
+                { number: "10+", label: "Trophies Won" }
+            ],
+            contact: "For sports inquiries, contact the Sports Director"
+        },
+        arts: {
+            title: "Arts & Culture",
+            icon: "fa-music",
+            description: "Programs to nurture creativity, cultural appreciation, and artistic expression through various art forms.",
+            fullDescription: "Our arts and culture programs help students explore their creative potential through music, dance, drama, and visual arts.",
+            features: [
+                "Music and dance classes",
+                "Drama and theater productions",
+                "Art and craft workshops",
+                "Cultural events and festivals",
+                "Talent shows",
+                "Art exhibitions"
+            ],
+            stats: [
+                { number: "6", label: "Art Programs" },
+                { number: "150+", label: "Students Enrolled" },
+                { number: "5+", label: "Annual Events" }
+            ],
+            contact: "For arts inquiries, contact the Arts Coordinator"
+        },
+        clubs: {
+            title: "Clubs & Societies",
+            icon: "fa-users",
+            description: "Various clubs for student interests, leadership development, and extracurricular engagement.",
+            fullDescription: "Students can join various clubs that align with their interests, developing leadership skills and pursuing their passions outside the classroom.",
+            features: [
+                "Debate and public speaking club",
+                "Science and innovation club",
+                "Environmental club",
+                "Entrepreneurship club",
+                "STEM club",
+                "Journalism club"
+            ],
+            stats: [
+                { number: "12", label: "Active Clubs" },
+                { number: "300+", label: "Club Members" },
+                { number: "20+", label: "Events Annually" }
+            ],
+            contact: "For clubs inquiries, contact the Student Affairs Office"
+        }
+    };
+
+    function showServiceDetails(serviceKey) {
+        const service = serviceDetails[serviceKey];
+        if (!service) return;
+        
+        // Set modal content
+        document.getElementById('modalTitle').innerHTML = `<i class="fa ${service.icon}"></i> ${service.title}`;
+        
+        document.getElementById('modalBody').innerHTML = `
+            <div class="modal-section">
+                <h3><i class="fa fa-info-circle"></i> Overview</h3>
+                <p>${service.fullDescription}</p>
+            </div>
+            
+            <div class="modal-section">
+                <h3><i class="fa fa-list-check"></i> Key Features</h3>
+                <ul class="modal-features">
+                    ${service.features.map(f => `<li><i class="fa fa-check-circle"></i> ${f}</li>`).join('')}
+                </ul>
+            </div>
+            
+            <div class="modal-section">
+                <h3><i class="fa fa-chart-simple"></i> Quick Stats</h3>
+                <div class="modal-stats">
+                    ${service.stats.map(s => `
+                        <div class="stat-badge">
+                            <div class="number">${s.number}</div>
+                            <div class="label">${s.label}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="modal-section">
+                <h3><i class="fa fa-phone"></i> Contact Information</h3>
+                <p>${service.contact}</p>
+                <p style="margin-top: 10px;"><i class="fa fa-envelope"></i> Email: info@gsremera.edu | <i class="fa fa-phone"></i> Phone: +250782160168</p>
+            </div>
+        `;
+        
+        // Show modal
+        document.getElementById('serviceModal').style.display = 'flex';
+        
+        // Track event
+        if (typeof trackEvent === 'function') {
+            trackEvent('learn_more', { service: service.title });
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('serviceModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('serviceModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Activity tracking
+    (function() {
+        const TRACKER_KEY = 'website_activity_data';
+        
+        function initTrackerData() {
+            if (!localStorage.getItem(TRACKER_KEY)) {
+                localStorage.setItem(TRACKER_KEY, JSON.stringify({ 
+                    sessions: {}, 
+                    events: [], 
+                    pageStats: {},
+                    startTime: new Date().toISOString() 
+                }));
+            }
+            return JSON.parse(localStorage.getItem(TRACKER_KEY));
+        }
+        
+        function saveTrackerData(data) {
+            localStorage.setItem(TRACKER_KEY, JSON.stringify(data));
+        }
+        
+        function getSessionId() {
+            let sessionId = sessionStorage.getItem('visitor_session_id');
+            if (!sessionId) {
+                sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+                sessionStorage.setItem('visitor_session_id', sessionId);
+                
+                const data = initTrackerData();
+                if (!data.sessions[sessionId]) {
+                    data.sessions[sessionId] = {
+                        id: sessionId,
+                        startTime: new Date().toISOString(),
+                        lastActivity: new Date().toISOString(),
+                        pageViews: 0,
+                        clicks: 0,
+                        pages: [],
+                        userAgent: navigator.userAgent,
+                        screenSize: screen.width + 'x' + screen.height
+                    };
+                    saveTrackerData(data);
+                }
+            }
+            return sessionId;
+        }
+        
+        window.trackEvent = function(type, details) {
+            const data = initTrackerData();
+            const sessionId = getSessionId();
+            
+            if (data.sessions[sessionId]) {
+                if (type === 'pageview') data.sessions[sessionId].pageViews++;
+                if (type === 'click') data.sessions[sessionId].clicks++;
+                data.sessions[sessionId].lastActivity = new Date().toISOString();
+            }
+            
+            data.events.unshift({
+                type: type,
+                details: details,
+                page: window.location.pathname,
+                timestamp: new Date().toISOString(),
+                sessionId: sessionId
+            });
+            
+            if (data.events.length > 500) data.events.pop();
+            saveTrackerData(data);
+        };
+        
+        window.addEventListener('load', () => {
+            trackEvent('pageview', { title: document.title, url: window.location.href });
+        });
+        
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('a, button, .service-card, .why-card, .pricing-card, .testimonial-card, .cta-btn, .service-btn, nav a') || e.target;
+            if (!target.closest('.modal')) {
+                trackEvent('click', { 
+                    element: target.tagName, 
+                    text: target.innerText?.substring(0, 50)
+                });
+            }
+        });
+        
+        console.log('✓ Activity tracker active');
+    })();
+</script>
+
+</body>
+</html>

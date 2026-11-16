@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G.S Remera TSS - Visitor Activity Dashboard</title>
+<link rel="icon" type="image/png" href="2.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{ font-family: Algerian, serif;background:rgb(69,53,53);min-height:100vh;display:flex;flex-direction:column;}
+body.dark-mode{background:#1a1a2e;}
+body.dark-mode .main-content{background:#16213e;color:#eee;}
+body.dark-mode .card,body.dark-mode .stats-card,body.dark-mode .table-container,body.dark-mode .modal-content,body.dark-mode .form-panel{background:#0f3460;color:#eee;}
+body.dark-mode table td{border-bottom-color:#1a1a2e;color:#ddd;}
+body.dark-mode th{background:#0a1628;}
+body.dark-mode input,body.dark-mode select,body.dark-mode textarea{background:#1a1a2e;border-color:#0f3460;color:white;}
+body.dark-mode footer{background:#0f3460;}
+header{background:rgb(5,203,238);font-family: Algerian, serif;color:white;padding:15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+header img{height:80px;object-fit:contain;}
+.header-controls{display:flex;align-items:center;gap:15px;}
+.dark-toggle{background:rgba(255,255,255,0.2);border:none;color:white;padding:8px 15px;border-radius:20px;cursor:pointer;font-size:14px;transition:0.3s;}
+.dark-toggle:hover{background:rgba(255,255,255,0.3);}
+.user-badge{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.2);padding:5px 15px;border-radius:30px;}
+.user-avatar{width:35px;height:35px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#0055aa;font-weight:bold;overflow:hidden;flex-shrink:0;}
+.user-avatar img{width:100%;height:100%;object-fit:cover;}
+@media(max-width:768px){header img{height:50px;}header div{font-size:16px!important;}.user-badge span{display:none;}}
+nav{display:flex;justify-content:center;background:#0055aa;position:sticky;top:0;z-index:100;flex-wrap:wrap;}
+nav a{padding:15px 20px;text-decoration:none;color:white;font-weight:bold;transition:0.3s;}
+nav a:hover{color:chartreuse;background:white;border-radius:10px;}
+nav a.active{color:chartreuse;background:white;border-radius:10px;}
+.admin-wrapper{display:flex;flex:1;min-height:calc(100vh - 280px);}
+.sidebar{width:280px;background:#0055aa;color:white;overflow-y:auto;}
+.sidebar-header{background:rgb(5,203,238);padding:20px;text-align:center;}
+.sidebar-header h3{font-size:18px;margin-bottom:5px;}
+.sidebar-header p{font-size:12px;opacity:0.9;}
+.sidebar-menu{padding:15px 0;}
+.menu-item{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.3s;border-left:3px solid transparent;}
+.menu-item:hover{background:rgba(255,255,255,0.1);padding-left:30px;}
+.menu-item.active{background:rgba(5,203,238,0.2);border-left-color:rgb(5,203,238);}
+.menu-item i{width:20px;}
+.main-content{flex:1;padding:25px;background:rgba(255,255,255,0.95);overflow-y:auto;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:30px;}
+.stats-card{background:white;border-radius:15px;padding:20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:transform 0.3s;}
+.stats-card:hover{transform:translateY(-3px);}
+.stats-info h3{font-size:12px;color:#666;margin-bottom:8px;}
+.stats-number{font-size:28px;font-weight:bold;color:#0055aa;}
+.stats-icon{width:50px;height:50px;background:linear-gradient(135deg,#0055aa,rgb(5,203,238));border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-size:24px;}
+.charts-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:25px;margin-bottom:30px;}
+.chart-card{background:white;border-radius:15px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.chart-card h3{margin-bottom:15px;color:#0055aa;}
+.table-container{background:white;border-radius:15px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);overflow-x:auto;margin-bottom:25px;}
+.table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:15px;}
+.btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.3s;}
+.btn-primary{background:#0055aa;color:white;}
+.btn-primary:hover{background:#003d80;}
+.btn-danger{background:#dc3545;color:white;}
+.btn-danger:hover{background:#c82333;}
+.btn-success{background:#28a745;color:white;}
+.btn-warning{background:#ffc107;color:#333;}
+.btn-info{background:#17a2b8;color:white;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;padding:12px;background:#0055aa;color:white;font-weight:600;}
+td{padding:12px;border-bottom:1px solid #e2e8f0;}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-success{background:#d4edda;color:#155724;}
+.badge-warning{background:#fff3cd;color:#856404;}
+.badge-danger{background:#f8d7da;color:#721c24;}
+.badge-info{background:#d1ecf1;color:#0c5460;}
+.activity-feed{max-height:400px;overflow-y:auto;}
+.activity-item{padding:12px;border-left:3px solid #0055aa;background:#f7fafc;margin-bottom:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.activity-type{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:bold;margin-right:8px;}
+.type-pageview{background:#28a745;color:white;}
+.type-click{background:#ffc107;color:#333;}
+.type-form{background:#17a2b8;color:white;}
+.type-scroll{background:#6f42c1;color:white;}
+.type-time{background:#fd7e14;color:white;}
+.type-message{background:#e83e8c;color:white;}
+.login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0055aa,rgb(5,203,238));}
+.login-box{background:white;padding:40px;border-radius:15px;width:100%;max-width:500px;box-shadow:0 10px 40px rgba(0,0,0,0.2);}
+.login-box h2{text-align:center;margin-bottom:20px;color:#0055aa;}
+.login-box input{width:100%;padding:12px;margin-bottom:15px;border:1px solid #ddd;border-radius:8px;}
+.login-btn{width:100%;padding:12px;background:#0055aa;color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:600;margin-bottom:15px;}
+.login-btn:hover{background:rgb(5,203,238);}
+.voice-btn{width:100%;padding:12px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:600;margin-bottom:15px;transition:0.3s;}
+.voice-btn:hover{background:#218838;}
+.voice-btn.listening{background:#dc3545;animation:pulse 1s infinite;}
+.voice-btn.mic-on{background:#17a2b8;}
+@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.02);}100%{transform:scale(1);}}
+.voice-status{text-align:center;margin:10px 0;padding:8px;border-radius:8px;font-size:13px;background:#f0f2f5;color:#333;}
+.voice-status.listening-active{background:#c8e6c9;color:#155724;}
+.voice-status.word-detected{background:#fff3cd;color:#856404;}
+.login-error{color:#dc3545;text-align:center;margin-top:15px;display:none;}
+.back-home-link{display:block;text-align:center;margin-top:20px;padding:10px;color:#0055aa;text-decoration:none;font-size:14px;border-top:1px solid #eee;transition:0.3s;}
+.back-home-link:hover{color:rgb(5,203,238);background:#f5f5f5;border-radius:8px;}
+.mic-icon{display:inline-block;width:12px;height:12px;border-radius:50%;background:#28a745;margin-right:8px;animation:blink 1s infinite;}
+@keyframes blink{0%{opacity:1;}50%{opacity:0.3;}100%{opacity:1;}}
+.speech-log{font-size:11px;color:#666;margin-top:5px;padding:5px;background:#f8f9fa;border-radius:5px;max-height:150px;overflow-y:auto;}
+.speech-item{padding:3px 0;border-bottom:1px solid #eee;}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center;}
+.modal-content{background:white;border-radius:15px;width:90%;max-width:600px;max-height:80vh;overflow-y:auto;}
+.modal-header{padding:20px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;background:#0055aa;color:white;border-radius:15px 15px 0 0;}
+.modal-body{padding:20px;}
+.modal-footer{padding:20px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:10px;}
+.close-modal{cursor:pointer;font-size:24px;color:white;}
+.reply-box{background:#f8f9fa;padding:15px;border-radius:10px;margin-top:20px;}
+.reply-box textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;font-family:inherit;}
+footer{background:rgb(5,203,238);color:white;padding:30px 20px;margin-top:auto;}
+.footer-content{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;max-width:1200px;margin:0 auto;}
+.footer-section{flex:1;min-width:180px;}
+.footer-section h3{margin-bottom:15px;font-size:16px;}
+.footer-section a{color:white;text-decoration:none;font-size:13px;line-height:1.8;}
+.social-icons{display:flex;gap:12px;margin-top:15px;flex-wrap:wrap;}
+.icon{display:inline-flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:50%;color:white;font-size:18px;transition:0.3s;}
+.fb{background:#1877f2;}.yt{background:#ff0000;}.tt{background:#000000;}.ig{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4);}
+.icon:hover{transform:scale(1.1);}
+hr{margin:20px 0;border:1px solid rgba(255,255,255,0.2);}
+.copyright{text-align:center;font-size:12px;}
+.voice-log{background:#e8f5e9;border-left:4px solid #28a745;}
+.language-badge{background:#6c757d;color:white;padding:2px 6px;border-radius:10px;font-size:10px;margin-left:5px;}
+.admin-footer-btn{display:inline-block;background:rgb(5,203,238);color:white;padding:10px 20px;border-radius:30px;text-decoration:none;font-weight:bold;font-size:14px;transition:all 0.3s;margin-top:15px;}
+.admin-footer-btn:hover{background:white;color:rgb(5,203,238);transform:scale(1.05);}
+.setting-group{margin-bottom:25px;padding:20px;background:#f8f9fa;border-radius:12px;border-left:4px solid #0055aa;}
+.setting-group label{display:block;font-weight:bold;margin-bottom:8px;color:#0055aa;}
+.setting-group input, .setting-group select{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;}
+.setting-group .btn{margin-top:10px;}
+.profile-pic-upload{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.profile-pic-upload .preview-img{width:80px;height:80px;border-radius:50%;border:3px solid #0055aa;object-fit:cover;background:#eee;}
+.profile-pic-upload .upload-actions{display:flex;gap:10px;flex-wrap:wrap;}
+@media(max-width:768px){.admin-wrapper{flex-direction:column;}.sidebar{width:100%;}.stats-grid{grid-template-columns:1fr 1fr;}.charts-row{grid-template-columns:1fr;}.footer-content{flex-direction:column;text-align:center;}.social-icons{justify-content:center;}.activity-item{flex-direction:column;align-items:flex-start;}}
+</style>
+</head>
+<body>
+
+<div id="loginPage" class="login-page">
+    <div class="login-box">
+        <h2><i class="fa fa-chart-line"></i> ADMIN Dashboard</h2>
+        <div id="loginError" class="login-error"></div>
+        
+        <div id="voiceStatus" class="voice-status listening-active">
+            <span class="mic-icon"></span> <strong>🌍 GLOBAL VOICE RECOGNITION ACTIVE!</strong><br>
+        </div>
+        <button id="voiceLoginBtn" class="voice-btn mic-on">
+            <i class="fa fa-globe"></i> 🌐 Voice Recognition: <strong>ON</strong>
+        </button>
+        
+        <div style="text-align:center; margin:10px 0; color:#718096;">— OR —</div>
+        
+        <form id="loginForm">
+            <input type="text" id="adminUsername" placeholder="Username" required>
+            <input type="password" id="adminPassword" placeholder="Password" required>
+            <button type="submit" class="login-btn"><i class="fa fa-sign-in-alt"></i> Access Dashboard</button>
+        </form>
+        
+        <a href="Home.html" class="back-home-link"><i class="fa fa-home"></i> Back to Home</a>
+        <div style="text-align:center;margin-top:15px;font-size:12px;color:#718096;">
+        </div>
+    </div>
+</div>
+
+<div id="dashboard" style="display:none;">
+    <header>
+        <a href="Home.html"><img src="2.png" alt="Logo" height="100"></a>
+        <div style="text-align: center; font-size: 28px; font-weight: bold;">WELCOME TO GS REMERA TSS</div>
+        <div class="header-controls">
+            <button class="dark-toggle" onclick="toggleDarkMode()"><i class="fa fa-moon"></i> Dark Mode</button>
+            <div class="user-badge">
+                <div class="user-avatar" id="adminAvatar"><span id="adminAvatarText">A</span></div>
+                <span id="adminName">Admin</span>
+            </div>
+        </div>
+    </header>
+    <nav>
+        <a href="Home.html">Home</a><a href="department.html">Department</a> <a href="about.html">About</a><a href="stakeholder.html">Stakeholders</a>
+        <a href="log in2.html">Accounting</a><a href="login.html">Marks Portal</a><a href="event.html">Events</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+    <div class="admin-wrapper">
+        <div class="sidebar">
+            <div class="sidebar-header"><h3><i class="fa fa-chart-line"></i> ACTIVITY ANALYZER</h3><p>Real-time Visitor Tracking</p></div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-page="dashboard"><i class="fa fa-tachometer-alt"></i> Dashboard</div>
+                <div class="menu-item" data-page="live"><i class="fa fa-broadcast-tower"></i> Live Visitors</div>
+                <div class="menu-item" data-page="sessions"><i class="fa fa-users"></i> Visitor Sessions</div>
+                <div class="menu-item" data-page="pageviews"><i class="fa fa-eye"></i> Page Views</div>
+                <div class="menu-item" data-page="clicks"><i class="fa fa-mouse-pointer"></i> Click Tracking</div>
+                <div class="menu-item" data-page="forms"><i class="fa fa-file-alt"></i> Form Submissions</div>
+                <div class="menu-item" data-page="messages"><i class="fa fa-envelope"></i> Visitor Messages</div>
+                <div class="menu-item" data-page="scrolls"><i class="fa fa-arrow-down"></i> Scroll Depth</div>
+                <div class="menu-item" data-page="time"><i class="fa fa-clock"></i> Time on Site</div>
+                <div class="menu-item" data-page="analytics"><i class="fa fa-chart-line"></i> Analytics</div>
+                <div class="menu-item" data-page="settings"><i class="fa fa-cog"></i> High Settings</div>
+                <div class="menu-item" onclick="logout()"><i class="fa fa-sign-out-alt"></i> Logout</div>
+            </div>
+        </div>
+        <div class="main-content" id="mainContent"><div style="text-align:center;padding:40px;"><i class="fa fa-spinner fa-spin" style="font-size:40px;color:#0055aa;"></i><p>Loading Visitor Activity...</p></div></div>
+    </div>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section"><a href="Home.html"><img src="2.png" alt="Logo" height="200"></a></div>
+            <div class="footer-section"><h3>Quick Links</h3><p><a href="Home.html">Home</a></p><p><a href="department.html">Department</a></p><p><a href="stakeholder.html">Stakeholders</a></p><p><a href="event.html">Events</a></p><p><a href="contact.html">Contact</a></p></div>
+            <div class="footer-section"><h3>Contact Us</h3><p><i class="fa fa-envelope"></i> busoro1972@gmail.com</p><p><i class="fa fa-phone"></i> +250782160168</p></div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/profile.php?id=61587210833693" class="icon fb"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.youtube.com/watch?v=YRhBfL3GEjQ" class="icon yt"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.tiktok.com/@osamathelegend4" class="icon tt"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.instagram.com/hirwaosama10/" class="icon ig"><i class="fab fa-instagram"></i></a>
+                </div>
+                <a href="admin.html" class="admin-footer-btn"><i class="fa fa-shield-alt"></i> Admin Dashboard</a>
+            </div>
+            <div class="footer-section"><h3>Location</h3><iframe src="https://www.google.com/maps?q=G.S+REMERA+TSS+Rulindo+Cyinzuzi&output=embed" style="width:200px;height:150px;border:0;border-radius:8px;"></iframe></div>
+        </div>
+        <hr><div class="copyright"><p>Copyright © 2026 G.S Remera TSS | Visitor Activity Tracking System</p></div>
+    </footer>
+</div>
+
+<script>
+// ============================================================
+// COMPLETE ADMIN DASHBOARD - ALL SIDEBAR ITEMS FUNCTIONAL
+// ============================================================
+
+// ===================== ADMIN PROFILE PICTURE =====================
+let adminProfileImage = localStorage.getItem('admin_profile_image') || null;
+
+function updateAdminAvatar() {
+    const avatarContainer = document.getElementById('adminAvatar');
+    if (adminProfileImage) {
+        avatarContainer.innerHTML = `<img src="${adminProfileImage}" alt="Admin">`;
+    } else {
+        avatarContainer.innerHTML = `<span id="adminAvatarText">A</span>`;
+    }
+}
+
+function handleProfileImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { alert('Please upload an image file.'); return; }
+    if (file.size > 2 * 1024 * 1024) { alert('Image size must be less than 2MB.'); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        adminProfileImage = e.target.result;
+        localStorage.setItem('admin_profile_image', adminProfileImage);
+        updateAdminAvatar();
+        const previewImg = document.getElementById('profilePreviewImg');
+        if (previewImg) previewImg.src = adminProfileImage;
+        alert('✅ Profile picture updated successfully!');
+        trackAdminActivity('profile_picture_updated');
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeProfileImage() {
+    if (confirm('Remove your profile picture?')) {
+        adminProfileImage = null;
+        localStorage.removeItem('admin_profile_image');
+        updateAdminAvatar();
+        const previewImg = document.getElementById('profilePreviewImg');
+        if (previewImg) previewImg.src = '';
+        alert('Profile picture removed.');
+        trackAdminActivity('profile_picture_removed');
+    }
+}
+
+// ===================== VOICE RECOGNITION =====================
+let recognition = null;
+let isListening = false;
+let voiceEnabled = true;
+let speechHistory = [];
+let lastDetectionTime = 0;
+let currentLanguageIndex = 0;
+const supportedLanguages = ['en-US', 'en-GB', 'fr-FR', 'sw-KE', 'rw-RW', 'es-ES', 'de-DE', 'it-IT', 'pt-PT', 'zh-CN', 'ar-SA', 'hi-IN', 'ru-RU'];
+
+function addToSpeechLog(text) {
+    const time = new Date().toLocaleTimeString();
+    speechHistory.unshift({ time, text });
+    if (speechHistory.length > 20) speechHistory.pop();
+}
+
+function detectLanguage(transcript) {
+    const adminVariants = ['admin', 'administrateur', 'administrator', '管理人'];
+    for (let variant of adminVariants) {
+        if (transcript.toLowerCase().includes(variant.toLowerCase())) return true;
+    }
+    return transcript.toLowerCase().includes('admin');
+}
+
+function initVoiceRecognition() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        document.getElementById('voiceStatus').innerHTML = '<i class="fa fa-exclamation-triangle"></i> Voice login not supported';
+        return false;
+    }
+    startNewRecognition();
+    return true;
+}
+
+function startNewRecognition() {
+    if (!voiceEnabled) return;
+    try {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 5;
+        recognition.lang = supportedLanguages[currentLanguageIndex % supportedLanguages.length];
+        setupRecognitionHandlers();
+        recognition.start();
+        isListening = true;
+    } catch(e) { setTimeout(() => { if (voiceEnabled) startNewRecognition(); }, 1000); }
+}
+
+function setupRecognitionHandlers() {
+    if (!recognition) return;
+    recognition.onresult = function(event) {
+        const now = Date.now();
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const result = event.results[i];
+            for (let j = 0; j < result.length; j++) {
+                const transcript = result[j].transcript.toLowerCase().trim();
+                if (transcript.length > 0) {
+                    addToSpeechLog(transcript);
+                    if (detectLanguage(transcript) && (now - lastDetectionTime) > 3000) {
+                        lastDetectionTime = now;
+                        performVoiceLogin(transcript);
+                    }
+                }
+            }
+        }
+    };
+    recognition.onerror = function(event) {
+        if (event.error === 'not-allowed') voiceEnabled = false;
+    };
+    recognition.onend = function() {
+        if (voiceEnabled) { currentLanguageIndex++; setTimeout(() => { if (voiceEnabled) startNewRecognition(); }, 500); }
+    };
+}
+
+function performVoiceLogin(detectedText) {
+    sessionStorage.setItem('admin_logged', 'true');
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadPage('dashboard');
+    alert(`✅ Voice login successful! (Detected: "${detectedText}")`);
+}
+
+function toggleVoiceRecognition() {
+    voiceEnabled = !voiceEnabled;
+    if (voiceEnabled) startNewRecognition();
+    else if (recognition && isListening) recognition.stop();
+    const btn = document.getElementById('voiceLoginBtn');
+    if (btn) btn.innerHTML = voiceEnabled ? '<i class="fa fa-globe"></i> 🌐 Voice Recognition: <strong>ON</strong>' : '<i class="fa fa-microphone-slash"></i> Voice Recognition: OFF';
+    const settingsBtn = document.getElementById('voiceToggleBtn');
+    if (settingsBtn) {
+        settingsBtn.className = `btn ${voiceEnabled ? 'btn-success' : 'btn-danger'}`;
+        settingsBtn.innerHTML = `<i class="fa ${voiceEnabled ? 'fa-microphone' : 'fa-microphone-slash'}"></i> ${voiceEnabled ? 'Disable' : 'Enable'} Voice`;
+    }
+}
+
+// ===================== ADMIN CREDENTIALS =====================
+let ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' };
+const savedCreds = localStorage.getItem('admin_creds');
+if(savedCreds) ADMIN_CREDENTIALS = JSON.parse(savedCreds);
+
+// ===================== LOGIN =====================
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('adminUsername').value;
+    const password = document.getElementById('adminPassword').value;
+    if(username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+        sessionStorage.setItem('admin_logged', 'true');
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        updateAdminAvatar();
+        loadPage('dashboard');
+    } else {
+        document.getElementById('loginError').textContent = 'Invalid credentials';
+        document.getElementById('loginError').style.display = 'block';
+        setTimeout(() => { document.getElementById('loginError').style.display = 'none'; }, 3000);
+    }
+});
+
+document.getElementById('voiceLoginBtn')?.addEventListener('click', toggleVoiceRecognition);
+initVoiceRecognition();
+
+// ===================== DATA FUNCTIONS =====================
+function getActivityData() { return JSON.parse(localStorage.getItem('website_activity_data') || '{"sessions":{},"events":[],"pageStats":{},"startTime":"' + new Date().toISOString() + '"}'); }
+function saveActivityData(data) { localStorage.setItem('website_activity_data', JSON.stringify(data)); }
+function getMessages() { return JSON.parse(localStorage.getItem('ticket_system_messages') || '[]'); }
+function saveMessages(m) { localStorage.setItem('ticket_system_messages', JSON.stringify(m)); }
+function trackAdminActivity(action, details = {}) { const activities = JSON.parse(localStorage.getItem('admin_activity') || '[]'); activities.unshift({ id: Date.now(), action: action, details: details, timestamp: new Date().toISOString() }); if(activities.length > 200) activities.pop(); localStorage.setItem('admin_activity', JSON.stringify(activities)); }
+
+// ===================== GENERATE SAMPLE DATA =====================
+function generateSampleEvents() {
+    const data = getActivityData();
+    if (Object.keys(data.sessions).length === 0) {
+        const pages = ['Home', 'Department', 'About', 'Stakeholders', 'Accounting', 'Marks', 'Events', 'Contact'];
+        const actions = ['pageview', 'click', 'scroll', 'form_submit', 'time_spent'];
+        const events = [];
+        for (let i = 0; i < 50; i++) {
+            events.push({
+                type: actions[Math.floor(Math.random() * actions.length)],
+                page: pages[Math.floor(Math.random() * pages.length)],
+                timestamp: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+                sessionId: 'sess_' + Math.floor(Math.random() * 20)
+            });
+        }
+        const sessions = {};
+        for (let i = 0; i < 15; i++) {
+            const id = 'sess_' + i;
+            sessions[id] = {
+                id: id,
+                pageViews: Math.floor(Math.random() * 15) + 1,
+                clicks: Math.floor(Math.random() * 25),
+                timeOnSite: Math.floor(Math.random() * 600) + 30,
+                startTime: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+                lastActivity: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
+                pageViewsByPage: pages.reduce((acc, p) => { acc[p] = Math.floor(Math.random() * 8); return acc; }, {})
+            };
+        }
+        data.events = events;
+        data.sessions = sessions;
+        saveActivityData(data);
+    }
+}
+generateSampleEvents();
+
+// ===================== PAGE LOADING - ALL SIDEBAR ITEMS =====================
+function loadPage(page) {
+    document.querySelectorAll('.menu-item[data-page]').forEach(item => { 
+        item.classList.remove('active'); 
+        if(item.dataset.page === page) item.classList.add('active'); 
+    });
+    
+    switch(page) {
+        case 'dashboard': loadDashboard(); break;
+        case 'live': loadLiveVisitors(); break;
+        case 'sessions': loadSessions(); break;
+        case 'pageviews': loadPageViews(); break;
+        case 'clicks': loadClicks(); break;
+        case 'forms': loadForms(); break;
+        case 'messages': loadVisitorMessages(); break;
+        case 'scrolls': loadScrolls(); break;
+        case 'time': loadTimeOnSite(); break;
+        case 'analytics': loadAnalytics(); break;
+        case 'settings': loadSettings(); break;
+        default: document.getElementById('mainContent').innerHTML = '<div style="padding:40px;text-align:center;">Page not found</div>';
+    }
+}
+
+// ===================== DASHBOARD =====================
+function loadDashboard() {
+    const data = getActivityData();
+    const sessions = Object.values(data.sessions || {});
+    const events = data.events || [];
+    const messages = getMessages();
+    document.getElementById('mainContent').innerHTML = `
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Total Visitors</h3><div class="stats-number">${sessions.length}</div></div><div class="stats-icon"><i class="fa fa-users"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Messages</h3><div class="stats-number">${messages.length}</div></div><div class="stats-icon"><i class="fa fa-envelope"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Page Views</h3><div class="stats-number">${sessions.reduce((sum, s) => sum + (s.pageViews || 0), 0)}</div></div><div class="stats-icon"><i class="fa fa-eye"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Total Events</h3><div class="stats-number">${events.length}</div></div><div class="stats-icon"><i class="fa fa-bolt"></i></div></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3><i class="fa fa-envelope"></i> Recent Messages</h3><button class="btn btn-primary" onclick="loadPage('messages')">View All Messages</button></div>
+        <div class="activity-feed">${messages.slice(0,5).map(m => `<div class="activity-item"><span><span class="activity-type type-message">MESSAGE</span> <strong>${escapeHtml(m.name)}</strong>: ${escapeHtml(m.subject)}</span><span>${formatDate(m.timestamp)}</span></div>`).join('')}${messages.length===0?'<div style="text-align:center;padding:30px;">No messages yet.</div>':''}</div></div>
+        <div class="charts-row">
+            <div class="chart-card"><h3>Recent Activity</h3><canvas id="dashChart"></canvas></div>
+        </div>
+    `;
+    setTimeout(() => {
+        const ctx = document.getElementById('dashChart')?.getContext('2d');
+        if (ctx) {
+            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const data2 = labels.map(() => Math.floor(Math.random() * 50) + 10);
+            new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets: [{ label: 'Visitors', data: data2, borderColor: '#0055aa', fill: true, backgroundColor: 'rgba(0,85,170,0.1)' }] },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+        }
+    }, 100);
+}
+
+// ===================== LIVE VISITORS =====================
+function loadLiveVisitors() {
+    const data = getActivityData();
+    const sessions = Object.values(data.sessions || {});
+    const recent = sessions.filter(s => new Date(s.lastActivity) > new Date(Date.now() - 5*60*1000));
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-broadcast-tower"></i> Live Visitors</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Currently Online</h3><div class="stats-number">${recent.length}</div></div><div class="stats-icon"><i class="fa fa-users"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Last 5 Minutes</h3><div class="stats-number">${recent.length}</div></div><div class="stats-icon"><i class="fa fa-clock"></i></div></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3>Active Visitors</h3><button class="btn btn-primary" onclick="loadLiveVisitors()"><i class="fa fa-refresh"></i> Refresh</button></div>
+        <table><thead><tr><th>Visitor ID</th><th>Page Views</th><th>Clicks</th><th>Last Activity</th><th>Status</th></tr></thead><tbody>
+            ${recent.length > 0 ? recent.map(s => `<tr><td>${escapeHtml(s.id)}</td><td>${s.pageViews}</td><td>${s.clicks}</td><td>${formatDate(s.lastActivity)}</td><td><span class="badge badge-success">Online</span></td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center">No active visitors</td></tr>'}
+        </tbody></div>`;
+}
+
+// ===================== SESSIONS =====================
+function loadSessions() {
+    const data = getActivityData();
+    const sessions = Object.values(data.sessions || {});
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-users"></i> Visitor Sessions</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Total Sessions</h3><div class="stats-number">${sessions.length}</div></div><div class="stats-icon"><i class="fa fa-users"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Avg Page Views</h3><div class="stats-number">${sessions.length ? (sessions.reduce((s, c) => s + (c.pageViews||0), 0) / sessions.length).toFixed(1) : 0}</div></div><div class="stats-icon"><i class="fa fa-eye"></i></div></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3>All Sessions</h3></div>
+        <table><thead><tr><th>Session ID</th><th>Page Views</th><th>Clicks</th><th>Time (s)</th><th>Start</th><th>Last Activity</th></tr></thead><tbody>
+            ${sessions.map(s => `<tr><td>${escapeHtml(s.id)}</td><td>${s.pageViews||0}</td><td>${s.clicks||0}</td><td>${s.timeOnSite||0}</td><td>${formatDate(s.startTime)}</td><td>${formatDate(s.lastActivity)}</td></tr>`).join('')}
+            ${sessions.length===0?'<tr><td colspan="6" style="text-align:center">No sessions</td></tr>':''}
+        </tbody></div>`;
+}
+
+// ===================== PAGE VIEWS =====================
+function loadPageViews() {
+    const data = getActivityData();
+    const sessions = Object.values(data.sessions || {});
+    const pages = ['Home', 'Department', 'About', 'Stakeholders', 'Accounting', 'Marks', 'Events', 'Contact'];
+    const counts = pages.map(p => sessions.reduce((s, c) => s + (c.pageViewsByPage && c.pageViewsByPage[p] ? c.pageViewsByPage[p] : 0), 0));
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-eye"></i> Page Views</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Total Page Views</h3><div class="stats-number">${counts.reduce((a,b) => a+b, 0)}</div></div><div class="stats-icon"><i class="fa fa-eye"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Most Viewed</h3><div class="stats-number">${pages[counts.indexOf(Math.max(...counts))]}</div></div><div class="stats-icon"><i class="fa fa-star"></i></div></div>
+        </div>
+        <div class="chart-card"><h3>Page Views Distribution</h3><canvas id="pvChart"></canvas></div>
+        <div class="table-container"><div class="table-header"><h3>Page View Details</h3></div>
+        <table><thead><tr><th>Page</th><th>Views</th><th>% of Total</th></tr></thead><tbody>
+            ${pages.map((p, i) => `<tr><td><strong>${p}</strong></td><td>${counts[i]}</td><td>${counts.reduce((a,b)=>a+b,0) ? ((counts[i]/counts.reduce((a,b)=>a+b,0))*100).toFixed(1) : 0}%</td></tr>`).join('')}
+        </tbody></div>
+    `;
+    setTimeout(() => {
+        const ctx = document.getElementById('pvChart')?.getContext('2d');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: { labels: pages, datasets: [{ label: 'Page Views', data: counts, backgroundColor: '#0055aa' }] },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+    }, 100);
+}
+
+// ===================== CLICKS =====================
+function loadClicks() {
+    const data = getActivityData();
+    const sessions = Object.values(data.sessions || {});
+    const totalClicks = sessions.reduce((s, c) => s + (c.clicks||0), 0);
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-mouse-pointer"></i> Click Tracking</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Total Clicks</h3><div class="stats-number">${totalClicks}</div></div><div class="stats-icon"><i class="fa fa-mouse-pointer"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Avg Clicks/Session</h3><div class="stats-number">${sessions.length ? (totalClicks/sessions.length).toFixed(1) : 0}</div></div><div class="stats-icon"><i class="fa fa-chart-line"></i></div></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3>Click Activity</h3></div>
+        <table><thead><tr><th>Session</th><th>Clicks</th><th>Page Views</th><th>Click Rate</th></tr></thead><tbody>
+            ${sessions.slice(0,20).map(s => `<tr><td>${escapeHtml(s.id)}</td><td>${s.clicks||0}</td><td>${s.pageViews||0}</td><td>${s.pageViews ? ((s.clicks/s.pageViews)*100).toFixed(1) : 0}%</td></tr>`).join('')}
+            ${sessions.length===0?'<tr><td colspan="4" style="text-align:center">No click data</td></tr>':''}
+        </tbody></div>`;
+}
+
+// ===================== FORMS =====================
+function loadForms() {
+    const data = getActivityData();
+    const formEvents = (data.events||[]).filter(e => e.type === 'form_submit');
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-file-alt"></i> Form Submissions</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Total Submissions</h3><div class="stats-number">${formEvents.length}</div></div><div class="stats-icon"><i class="fa fa-file-alt"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Conversion Rate</h3><div class="stats-number">${Object.values(data.sessions||{}).length ? ((formEvents.length/Object.values(data.sessions||{}).length)*100).toFixed(1) : 0}%</div></div><div class="stats-icon"><i class="fa fa-percent"></i></div></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3>Form Submissions</h3></div>
+        <table><thead><tr><th>Page</th><th>Session</th><th>Time</th></tr></thead><tbody>
+            ${formEvents.map(e => `<tr><td>${escapeHtml(e.page||'N/A')}</td><td>${escapeHtml(e.sessionId||'N/A')}</td><td>${formatDate(e.timestamp)}</td></tr>`).join('')}
+            ${formEvents.length===0?'<tr><td colspan="3" style="text-align:center">No form submissions yet</td></tr>':''}
+        </tbody></div>`;
+}
+
+// ===================== MESSAGES =====================
+let currentMessageIndex = null;
+
+function loadVisitorMessages() {
+    const messages = getMessages();
+    const unreadCount = messages.filter(m => !m.isRead).length;
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-envelope"></i> Visitor Messages (Synced with Contact Page)</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Total Messages</h3><div class="stats-number">${messages.length}</div></div><div class="stats-icon"><i class="fa fa-envelope"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Unread</h3><div class="stats-number">${unreadCount}</div></div><div class="stats-icon"><i class="fa fa-envelope-open"></i></div></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3>All Contact Messages</h3><button class="btn btn-danger" onclick="deleteAllMessages()">Delete All</button></div>
+        <table><thead><tr><th>Status</th><th>From</th><th>Email</th><th>Subject</th><th>Priority</th><th>Date</th><th>Actions</th></tr></thead><tbody>
+            ${messages.map((m, idx) => `<tr>
+                <td>${!m.isRead ? '<span class="badge badge-warning">Unread</span>' : '<span class="badge badge-success">Read</span>'}</td>
+                <td><strong>${escapeHtml(m.name)}</strong></td>
+                <td>${escapeHtml(m.email)}</td>
+                <td>${escapeHtml(m.subject)}</td>
+                <td><span class="badge ${m.priority === 'high' ? 'badge-danger' : m.priority === 'medium' ? 'badge-warning' : 'badge-success'}">${m.priority || 'low'}</span></td>
+                <td>${formatDate(m.timestamp)}</td>
+                <td><button class="btn btn-info" onclick="viewMessageDetail(${idx})"><i class="fa fa-eye"></i> View & Reply</button> <button class="btn btn-danger" onclick="deleteMessage(${idx})"><i class="fa fa-trash"></i></button></td>
+            </tr>`).join('')}
+            ${messages.length === 0 ? '<tr><td colspan="7" style="text-align:center">No messages from visitors yet</td></tr>' : ''}
+        </tbody></div>`;
+}
+
+function viewMessageDetail(index) {
+    const messages = getMessages();
+    const msg = messages[index];
+    if(!msg) return;
+    currentMessageIndex = index;
+    if(!msg.isRead) {
+        msg.isRead = true;
+        saveMessages(messages);
+        loadVisitorMessages();
+    }
+    let existingReplyHtml = '';
+    if(msg.reply) {
+        if(typeof msg.reply === 'object') {
+            existingReplyHtml = `<div style="background:#e9f7ef;padding:15px;border-radius:10px;margin-bottom:15px;border-left:4px solid #28a745;">
+                <strong><i class="fa fa-reply-all"></i> Previous Reply (${escapeHtml(msg.reply.from || 'Admin')}):</strong>
+                <p style="margin-top:8px;">${escapeHtml(msg.reply.text)}</p>
+                <small><i class="fa fa-clock"></i> ${formatDate(msg.reply.repliedAt)}</small>
+            </div>`;
+        } else if(typeof msg.reply === 'string' && msg.reply) {
+            existingReplyHtml = `<div style="background:#e9f7ef;padding:15px;border-radius:10px;margin-bottom:15px;border-left:4px solid #28a745;">
+                <strong><i class="fa fa-reply-all"></i> Previous Reply:</strong>
+                <p style="margin-top:8px;">${escapeHtml(msg.reply)}</p>
+            </div>`;
+        }
+    }
+    document.body.insertAdjacentHTML('beforeend', `
+        <div id="messageModal" class="modal" style="display:flex;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fa fa-envelope"></i> Message from ${escapeHtml(msg.name)}</h3>
+                    <span class="close-modal" onclick="closeMessageModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom:15px;">
+                        <p><strong><i class="fa fa-user"></i> Name:</strong> ${escapeHtml(msg.name)}</p>
+                        <p><strong><i class="fa fa-envelope"></i> Email:</strong> ${escapeHtml(msg.email)}</p>
+                        <p><strong><i class="fa fa-phone"></i> Phone:</strong> ${escapeHtml(msg.phone || 'Not provided')}</p>
+                        <p><strong><i class="fa fa-tag"></i> Subject:</strong> ${escapeHtml(msg.subject)}</p>
+                        <p><strong><i class="fa fa-flag"></i> Priority:</strong> <span class="badge ${msg.priority === 'high' ? 'badge-danger' : msg.priority === 'medium' ? 'badge-warning' : 'badge-success'}">${msg.priority || 'low'}</span></p>
+                        <p><strong><i class="fa fa-calendar"></i> Sent:</strong> ${formatDate(msg.timestamp)}</p>
+                    </div>
+                    <div style="background:#f8f9fa;padding:15px;border-radius:10px;margin-bottom:15px;">
+                        <strong><i class="fa fa-comment"></i> Message:</strong>
+                        <p style="margin-top:10px;line-height:1.6;">${escapeHtml(msg.message)}</p>
+                    </div>
+                    ${existingReplyHtml}
+                    <div class="reply-box">
+                        <strong><i class="fa fa-reply"></i> Send Reply:</strong>
+                        <textarea id="replyMessage" rows="4" placeholder="Type your reply here..."></textarea>
+                        <button class="btn btn-primary" onclick="sendMessageReply()"><i class="fa fa-paper-plane"></i> Send Reply</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" onclick="deleteMessage(${currentMessageIndex})">Delete</button>
+                    <button class="btn btn-primary" onclick="closeMessageModal()">Close</button>
+                </div>
+            </div>
+        </div>
+        <div id="modalOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:999;"></div>
+    `);
+}
+
+function sendMessageReply() {
+    const reply = document.getElementById('replyMessage')?.value;
+    if(!reply) { alert('Please enter a reply message'); return; }
+    const messages = getMessages();
+    if(currentMessageIndex !== null && messages[currentMessageIndex]) {
+        messages[currentMessageIndex].reply = {
+            text: reply,
+            repliedAt: new Date().toISOString(),
+            from: "Admin (G.S Remera TSS)"
+        };
+        saveMessages(messages);
+        alert('✅ Reply sent successfully!');
+        closeMessageModal();
+        loadVisitorMessages();
+        trackAdminActivity('message_replied');
+    }
+}
+
+function closeMessageModal() {
+    document.getElementById('messageModal')?.remove();
+    document.getElementById('modalOverlay')?.remove();
+    loadVisitorMessages();
+}
+
+function deleteMessage(index) {
+    if(confirm('Delete this message?')) {
+        let messages = getMessages();
+        messages.splice(index, 1);
+        saveMessages(messages);
+        closeMessageModal();
+        loadVisitorMessages();
+        trackAdminActivity('message_deleted');
+    }
+}
+
+function deleteAllMessages() {
+    if(confirm('Delete ALL messages?')) {
+        saveMessages([]);
+        loadVisitorMessages();
+        trackAdminActivity('all_messages_deleted');
+    }
+}
+
+// ===================== SCROLLS =====================
+function loadScrolls() {
+    const data = getActivityData();
+    const scrollEvents = (data.events||[]).filter(e => e.type === 'scroll');
+    const avgDepth = scrollEvents.length ? (scrollEvents.reduce((s, e) => s + (e.depth||0), 0) / scrollEvents.length).toFixed(0) : 0;
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-arrow-down"></i> Scroll Depth</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Scroll Events</h3><div class="stats-number">${scrollEvents.length}</div></div><div class="stats-icon"><i class="fa fa-arrow-down"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Avg Scroll Depth</h3><div class="stats-number">${avgDepth}%</div></div><div class="stats-icon"><i class="fa fa-chart-line"></i></div></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3>Scroll Events</h3></div>
+        <table><thead><tr><th>Page</th><th>Depth</th><th>Session</th><th>Time</th></tr></thead><tbody>
+            ${scrollEvents.map(e => `<tr><td>${escapeHtml(e.page||'N/A')}</td><td>${e.depth||0}%</td><td>${escapeHtml(e.sessionId||'N/A')}</td><td>${formatDate(e.timestamp)}</td></tr>`).join('')}
+            ${scrollEvents.length===0?'<tr><td colspan="4" style="text-align:center">No scroll data yet</td></tr>':''}
+        </tbody></div>`;
+}
+
+// ===================== TIME ON SITE =====================
+function loadTimeOnSite() {
+    const data = getActivityData();
+    const sessions = Object.values(data.sessions || {});
+    const avgTime = sessions.length ? (sessions.reduce((s, c) => s + (c.timeOnSite||0), 0) / sessions.length).toFixed(0) : 0;
+    const maxTime = sessions.length ? Math.max(...sessions.map(s => s.timeOnSite||0)) : 0;
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-clock"></i> Time on Site</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Avg Time (s)</h3><div class="stats-number">${avgTime}s</div></div><div class="stats-icon"><i class="fa fa-clock"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Max Time (s)</h3><div class="stats-number">${maxTime}s</div></div><div class="stats-icon"><i class="fa fa-hourglass-end"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Total (min)</h3><div class="stats-number">${sessions.length ? (sessions.reduce((s,c) => s + (c.timeOnSite||0), 0) / 60).toFixed(1) : 0}m</div></div><div class="stats-icon"><i class="fa fa-hourglass-half"></i></div></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3>Session Times</h3></div>
+        <table><thead><tr><th>Session</th><th>Time (s)</th><th>Page Views</th><th>Avg Time/Page</th></tr></thead><tbody>
+            ${sessions.map(s => `<tr><td>${escapeHtml(s.id)}</td><td>${s.timeOnSite||0}s</td><td>${s.pageViews||0}</td><td>${s.pageViews ? ((s.timeOnSite||0)/s.pageViews).toFixed(1) : 0}s</td></tr>`).join('')}
+            ${sessions.length===0?'<tr><td colspan="4" style="text-align:center">No time data</td></tr>':''}
+        </tbody></div>`;
+}
+
+// ===================== ANALYTICS =====================
+function loadAnalytics() {
+    const data = getActivityData();
+    const sessions = Object.values(data.sessions || {});
+    const events = data.events || [];
+    const timeData = sessions.map(s => s.timeOnSite || 0).filter(t => t > 0);
+    const avgTime = timeData.length ? (timeData.reduce((a,b) => a+b, 0) / timeData.length).toFixed(0) : 0;
+    const bounceRate = sessions.length ? Math.round((sessions.filter(s => (s.pageViews || 0) < 2).length / sessions.length) * 100) : 0;
+    const pages = ['Home', 'Department', 'About', 'Stakeholders', 'Accounting', 'Marks', 'Events', 'Contact'];
+    const pageCounts = pages.map(label => sessions.reduce((sum, s) => sum + (s.pageViewsByPage && s.pageViewsByPage[label] ? s.pageViewsByPage[label] : 0), 0));
+
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-chart-line"></i> Advanced Analytics</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Total Sessions</h3><div class="stats-number">${sessions.length}</div></div><div class="stats-icon"><i class="fa fa-users"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Avg Time</h3><div class="stats-number">${avgTime}s</div></div><div class="stats-icon"><i class="fa fa-clock"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Total Events</h3><div class="stats-number">${events.length}</div></div><div class="stats-icon"><i class="fa fa-bolt"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Bounce Rate</h3><div class="stats-number">${bounceRate}%</div></div><div class="stats-icon"><i class="fa fa-percent"></i></div></div>
+        </div>
+        <div class="charts-row">
+            <div class="chart-card"><h3>Page Views</h3><canvas id="analyticsChart1"></canvas></div>
+            <div class="chart-card"><h3>Activity Trends</h3><canvas id="analyticsChart2"></canvas></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3>Top Sessions</h3><button class="btn btn-danger" onclick="clearAnalyticsData()">Clear Data</button></div>
+        <table><thead><tr><th>Session</th><th>Views</th><th>Clicks</th><th>Time</th></tr></thead><tbody>
+            ${sessions.slice(0,10).map(s => `<tr><td>${escapeHtml(s.id)}</td><td>${s.pageViews||0}</td><td>${s.clicks||0}</td><td>${s.timeOnSite||0}s</td></tr>`).join('')}
+        </tbody></div>
+    `;
+    setTimeout(() => {
+        const ctx1 = document.getElementById('analyticsChart1')?.getContext('2d');
+        if (ctx1) {
+            new Chart(ctx1, {
+                type: 'bar',
+                data: { labels: pages, datasets: [{ label: 'Views', data: pageCounts, backgroundColor: '#0055aa' }] },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+        const ctx2 = document.getElementById('analyticsChart2')?.getContext('2d');
+        if (ctx2) {
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: sessions.slice(-10).map((_, i) => `S${i+1}`),
+                    datasets: [
+                        { label: 'Views', data: sessions.slice(-10).map(s => s.pageViews||0), borderColor: '#0055aa', fill: false },
+                        { label: 'Clicks', data: sessions.slice(-10).map(s => s.clicks||0), borderColor: '#28a745', fill: false }
+                    ]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+    }, 100);
+}
+
+function clearAnalyticsData() {
+    if (confirm('Delete ALL analytics data?')) {
+        localStorage.removeItem('website_activity_data');
+        generateSampleEvents();
+        loadAnalytics();
+        trackAdminActivity('analytics_cleared');
+    }
+}
+
+// ===================== HIGH SETTINGS =====================
+function loadSettings() {
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-cog"></i> High Settings</h2>
+        <div class="setting-group">
+            <label><i class="fa fa-user-circle"></i> Admin Profile Picture</label>
+            <div class="profile-pic-upload">
+                <img id="profilePreviewImg" class="preview-img" src="${adminProfileImage || ''}" alt="Preview" style="${adminProfileImage ? '' : 'display:none;'}">
+                <div class="upload-actions">
+                    <button class="btn btn-primary" onclick="document.getElementById('profileImageInput').click()"><i class="fa fa-upload"></i> Upload</button>
+                    <input type="file" id="profileImageInput" accept="image/*" style="display:none" onchange="handleProfileImageUpload(event)">
+                    <button class="btn btn-danger" onclick="removeProfileImage()"><i class="fa fa-trash"></i> Remove</button>
+                </div>
+            </div>
+        </div>
+        <div class="setting-group">
+            <label><i class="fa fa-user-shield"></i> Admin Credentials</label>
+            <input type="text" id="newUsername" placeholder="Username" value="${ADMIN_CREDENTIALS.username}">
+            <input type="password" id="newPassword" placeholder="Password" value="${ADMIN_CREDENTIALS.password}">
+            <button class="btn btn-primary" onclick="updateCredentials()"><i class="fa fa-save"></i> Update</button>
+        </div>
+        <div class="setting-group">
+            <label><i class="fa fa-database"></i> Data Management</label>
+            <button class="btn btn-danger" onclick="clearAllData()"><i class="fa fa-trash"></i> Clear All Data</button>
+            <button class="btn btn-success" onclick="exportData()"><i class="fa fa-download"></i> Export</button>
+            <button class="btn btn-info" onclick="document.getElementById('importFile').click()"><i class="fa fa-upload"></i> Import</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+        </div>
+        <div class="setting-group">
+            <label><i class="fa fa-microphone"></i> Voice Recognition</label>
+            <button id="voiceToggleBtn" class="btn ${voiceEnabled ? 'btn-success' : 'btn-danger'}" onclick="toggleVoiceRecognition()">
+                <i class="fa ${voiceEnabled ? 'fa-microphone' : 'fa-microphone-slash'}"></i> ${voiceEnabled ? 'Disable' : 'Enable'} Voice
+            </button>
+            <button class="btn btn-warning" onclick="resetDemoData()"><i class="fa fa-undo"></i> Reset Demo</button>
+        </div>
+        <div class="setting-group">
+            <label><i class="fa fa-palette"></i> Theme</label>
+            <button class="btn btn-primary" onclick="toggleDarkMode()"><i class="fa fa-moon"></i> Toggle Dark Mode</button>
+        </div>
+        <div class="setting-group">
+            <label><i class="fa fa-clock"></i> System Info</label>
+            <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+            <p><strong>Storage:</strong> ${(new Blob([JSON.stringify(localStorage)]).size / 1024).toFixed(2)} KB used</p>
+        </div>
+    `;
+}
+
+// ===================== SETTINGS FUNCTIONS =====================
+function updateCredentials() {
+    const u = document.getElementById('newUsername').value.trim();
+    const p = document.getElementById('newPassword').value.trim();
+    if (u && p) {
+        ADMIN_CREDENTIALS = { username: u, password: p };
+        localStorage.setItem('admin_creds', JSON.stringify(ADMIN_CREDENTIALS));
+        document.getElementById('adminName').textContent = u;
+        alert('✅ Credentials updated!');
+        trackAdminActivity('credentials_updated');
+    } else {
+        alert('Please fill in both fields.');
+    }
+}
+
+function clearAllData() {
+    if (confirm('Delete ALL data?')) {
+        localStorage.removeItem('ticket_system_messages');
+        localStorage.removeItem('website_activity_data');
+        localStorage.removeItem('admin_activity');
+        generateSampleEvents();
+        alert('All data cleared.');
+        loadSettings();
+        trackAdminActivity('all_data_cleared');
+    }
+}
+
+function exportData() {
+    const data = {
+        messages: getMessages(),
+        analytics: getActivityData(),
+        adminActivity: JSON.parse(localStorage.getItem('admin_activity') || '[]'),
+        exportedAt: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `backup_${new Date().toISOString().slice(0,10)}.json`;
+    link.click();
+    trackAdminActivity('data_exported');
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.messages) saveMessages(data.messages);
+            if (data.analytics) saveActivityData(data.analytics);
+            alert('✅ Data imported!');
+            trackAdminActivity('data_imported');
+        } catch(err) {
+            alert('❌ Invalid file.');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function resetDemoData() {
+    if (confirm('Reset to demo data?')) {
+        localStorage.removeItem('ticket_system_messages');
+        localStorage.removeItem('website_activity_data');
+        generateSampleEvents();
+        const demoMsg = {
+            id: 999999,
+            name: "Demo Student",
+            email: "student@example.com",
+            phone: "0788000000",
+            subject: "Admission Requirements",
+            priority: "medium",
+            message: "Hello, I would like to know the requirements for joining senior secondary at G.S Remera TSS.",
+            timestamp: new Date(Date.now() - 2*24*60*60*1000).toISOString(),
+            isRead: false,
+            reply: null
+        };
+        saveMessages([demoMsg]);
+        alert('✅ Demo data reset.');
+        loadSettings();
+        trackAdminActivity('demo_data_reset');
+    }
+}
+
+// ===================== UTILITY =====================
+function formatDate(dateStr) { if(!dateStr) return 'N/A'; return new Date(dateStr).toLocaleString(); }
+function escapeHtml(text) { if(!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); }
+function logout() { sessionStorage.removeItem('admin_logged'); document.getElementById('dashboard').style.display = 'none'; document.getElementById('loginPage').style.display = 'flex'; }
+
+// ===================== INIT =====================
+document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+    item.addEventListener('click', () => loadPage(item.dataset.page));
+});
+
+if(localStorage.getItem('darkMode') === 'true') toggleDarkMode();
+
+if(sessionStorage.getItem('admin_logged') === 'true') {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    updateAdminAvatar();
+    loadPage('dashboard');
+}
+
+// Seed demo message if none exists
+const msgs = getMessages();
+const hasDemo = msgs.some(m => m.email === 'student@example.com');
+if (!hasDemo && msgs.length === 0) {
+    const demoMsg = {
+        id: 999999,
+        name: "Demo Student",
+        email: "student@example.com",
+        phone: "0788000000",
+        subject: "Admission Requirements",
+        priority: "medium",
+        message: "Hello, I would like to know the requirements for joining senior secondary at G.S Remera TSS.",
+        timestamp: new Date(Date.now() - 2*24*60*60*1000).toISOString(),
+        isRead: false,
+        reply: null
+    };
+    msgs.unshift(demoMsg);
+    saveMessages(msgs);
+}
+
+console.log('✅ ALL SIDEBAR ITEMS FULLY FUNCTIONAL');
+console.log('📊 Live Visitors, Sessions, Page Views, Clicks, Forms, Messages, Scrolls, Time, Analytics, Settings');
+console.log('📷 Profile picture upload working');
+</script>
+</body>
+</html>

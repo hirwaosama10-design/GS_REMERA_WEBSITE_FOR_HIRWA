@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G.S Remera TSS - Events & Publications</title>
+<link rel="icon" type="image/png" href="2.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Activity Tracker Script -->
+<script>
+(function() {
+    const TRACKER_KEY = 'website_activity_data';
+    
+    function initTrackerData() {
+        if (!localStorage.getItem(TRACKER_KEY)) {
+            localStorage.setItem(TRACKER_KEY, JSON.stringify({ 
+                sessions: {}, 
+                events: [], 
+                pageStats: {},
+                startTime: new Date().toISOString() 
+            }));
+        }
+        return JSON.parse(localStorage.getItem(TRACKER_KEY));
+    }
+    
+    function saveTrackerData(data) {
+        localStorage.setItem(TRACKER_KEY, JSON.stringify(data));
+    }
+    
+    function getSessionId() {
+        let sessionId = sessionStorage.getItem('visitor_session_id');
+        if (!sessionId) {
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+            sessionStorage.setItem('visitor_session_id', sessionId);
+            
+            const data = initTrackerData();
+            if (!data.sessions[sessionId]) {
+                data.sessions[sessionId] = {
+                    id: sessionId,
+                    startTime: new Date().toISOString(),
+                    lastActivity: new Date().toISOString(),
+                    pageViews: 0,
+                    clicks: 0,
+                    pages: [],
+                    userAgent: navigator.userAgent,
+                    screenSize: screen.width + 'x' + screen.height
+                };
+                saveTrackerData(data);
+            }
+        }
+        return sessionId;
+    }
+    
+    function trackEvent(type, details) {
+        const data = initTrackerData();
+        const sessionId = getSessionId();
+        
+        if (data.sessions[sessionId]) {
+            if (type === 'pageview') data.sessions[sessionId].pageViews++;
+            if (type === 'click') data.sessions[sessionId].clicks++;
+            data.sessions[sessionId].lastActivity = new Date().toISOString();
+        }
+        
+        data.events.unshift({
+            type: type,
+            details: details,
+            page: window.location.pathname,
+            timestamp: new Date().toISOString(),
+            sessionId: sessionId
+        });
+        
+        if (data.events.length > 500) data.events.pop();
+        saveTrackerData(data);
+    }
+    
+    window.addEventListener('load', () => {
+        trackEvent('pageview', { title: document.title, url: window.location.href });
+    });
+    
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('a, button, .event-card, .publication-card, .icon, nav a') || e.target;
+        trackEvent('click', { 
+            element: target.tagName, 
+            text: target.innerText?.substring(0, 50)
+        });
+    });
+    
+    console.log('✓ Activity tracker active');
+})();
+</script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Algerian, serif;
+        background: rgb(69, 53, 53);
+        background-size: cover;
+        min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+        background: rgb(5, 203, 238);
+        font-family: Algerian, serif;
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    header img {
+        height: 80px;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        header img { height: 50px; }
+        header div { font-size: 18px !important; }
+    }
+
+/* NAV */
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: 0.3s;
+}
+
+   nav a:hover {    color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+
+    nav a.active {
+        color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+
+    /* Page Header */
+    .page-header {
+        background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+        color: white;
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+    .page-header h1 {
+        font-size: 42px;
+        margin-bottom: 15px;
+    }
+
+    .page-header p {
+        font-size: 18px;
+        opacity: 0.95;
+    }
+
+    /* Tab Navigation */
+    .tab-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .tabs {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        padding: 12px 30px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #f0f2f5;
+        color: #333;
+    }
+
+    .tab-btn.active {
+        background: #0055aa;
+        color: white;
+    }
+
+    .tab-btn:hover {
+        background: rgb(5, 203, 238);
+        color: white;
+    }
+
+    /* Events Section */
+    .events-section, .publications-section, .gallery-section {
+        display: none;
+    }
+
+    .events-section.active, .publications-section.active, .gallery-section.active {
+        display: block;
+    }
+
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    .event-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+        cursor: pointer;
+    }
+
+    .event-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .event-date {
+        background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+        color: white;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .event-date .day {
+        font-size: 36px;
+        font-weight: bold;
+    }
+
+    .event-date .month {
+        font-size: 16px;
+    }
+
+    .event-content {
+        padding: 20px;
+    }
+
+    .event-title {
+        color: #0055aa;
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+
+    .event-location, .event-time {
+        color: #666;
+        font-size: 13px;
+        margin: 5px 0;
+    }
+
+    .event-location i, .event-time i {
+        margin-right: 8px;
+        color: rgb(5, 203, 238);
+    }
+
+    .event-description {
+        color: #555;
+        line-height: 1.5;
+        margin: 15px 0;
+    }
+
+    .event-btn {
+        background: #0055aa;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .event-btn:hover {
+        background: rgb(5, 203, 238);
+    }
+
+    /* Publications Grid */
+    .publications-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    .publication-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+
+    .publication-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .publication-icon {
+        background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+        padding: 30px;
+        text-align: center;
+    }
+
+    .publication-icon i {
+        font-size: 50px;
+        color: white;
+    }
+
+    .publication-content {
+        padding: 20px;
+    }
+
+    .publication-title {
+        color: #0055aa;
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+
+    .publication-date {
+        color: #888;
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+
+    .publication-description {
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 15px;
+    }
+
+    .download-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 20px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .download-btn:hover {
+        background: #218838;
+    }
+
+    /* Gallery */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .gallery-item {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+
+    .gallery-item:hover {
+        transform: scale(1.02);
+    }
+
+    .gallery-image {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .gallery-image i {
+        font-size: 60px;
+        color: white;
+    }
+
+    .gallery-caption {
+        padding: 15px;
+        text-align: center;
+        color: #333;
+        font-size: 14px;
+    }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: white;
+        max-width: 600px;
+        width: 90%;
+        border-radius: 15px;
+        overflow: hidden;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+    }
+
+    .close-modal {
+        font-size: 28px;
+        cursor: pointer;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+   /* Admin Link Button in Footer */
+    .admin-footer-btn {
+        display: inline-block;
+        background: rgb(5, 203, 238);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s;
+        margin-top: 15px;
+        border: none;
+    }
+
+    .admin-footer-btn:hover {
+        background: white;
+        color: rgb(5, 203, 238);
+        transform: scale(1.05);
+    }
+
+ footer {
+        background: rgb(5, 203, 238);
+        color: white;
+        padding: 40px 20px;
+        margin-top: 40px;
+    }
+
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .footer-section {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .footer-section h3 {
+        margin-bottom: 20px;
+        font-size: 18px;
+        position: relative;
+    }
+
+    .footer-section h3::after {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 2px;
+        background: white;
+        margin-top: 8px;
+    }
+
+    .footer-section p, .footer-section a {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .footer-section a:hover {
+        text-decoration: underline;
+    }
+
+    /* Social Icons */
+    .social-icons {
+        display: flex;
+        gap: 12px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .icon {
+        display: inline-flex;
+        width: 45px;
+        height: 45px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: white;
+        font-size: 20px;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+
+    .fb { background: #1877f2; }
+    .yt { background: #ff0000; }
+    .tt { background: #000000; }
+    .ig { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); }
+
+    .icon:hover {
+        transform: scale(1.1);
+        opacity: 0.9;
+    }
+
+    hr {
+        margin: 20px 0;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .copyright {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero h1 { font-size: 32px; }
+        .hero p { font-size: 16px; }
+        .section-title { font-size: 24px; }
+        .mv-card h3 { font-size: 22px; }
+        .stat-number { font-size: 32px; }
+        .footer-content { flex-direction: column; text-align: center; }
+        .social-icons { justify-content: center; }
+        .footer-section h3::after { margin-left: auto; margin-right: auto; }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <a href="Home.html">
+        <img src="2.png" alt="Logo" height="80">
+    </a>
+
+<nav>
+    <a href="Home.html">Home</a>
+    <a href="department.html">Department</a>
+     <a href="about.html">About</a>
+    <a href="stakeholder.html">Stakeholders</a>
+    <a href="Accounting.html">Accounting</a>
+    <a href="Marks Portal.html">Marks Portal</a>
+    <a href="event.html">Events</a>
+    <a href="contact.html">Contact</a>
+</nav>
+</header>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1><i class="fa fa-calendar-alt"></i> Events & Publications</h1>
+    <p>Stay updated with school events, news, and official publications</p>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tab-container">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('events')"><i class="fa fa-calendar"></i> Upcoming Events</button>
+        <button class="tab-btn" onclick="showTab('publications')"><i class="fa fa-book"></i> Publications</button>
+        <button class="tab-btn" onclick="showTab('gallery')"><i class="fa fa-images"></i> Gallery</button>
+    </div>
+
+    <!-- Events Section -->
+    <div id="eventsSection" class="events-section active">
+        <div class="events-grid" id="eventsGrid">
+            <!-- Events will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Publications Section -->
+    <div id="publicationsSection" class="publications-section">
+        <div class="publications-grid" id="publicationsGrid">
+            <!-- Publications will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Gallery Section -->
+    <div id="gallerySection" class="gallery-section">
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- Gallery will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Event Modal -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Event Details</h3>
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Event details will be loaded here -->
+        </div>
+    </div>
+</div>
+
+
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <a href="Home.html"><img src="2.png" alt="Logo" height="200"></a>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="Home.html">Home</a></p>
+            <p><a href="department.html">Department</a></p>
+            <p><a href="stakeholder.html">Stakeholders</a></p>
+            <p><a href="event.html">Events</a></p>
+            <p><a href="contact.html">Contact</a></p>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fa fa-envelope"></i> busoro1972@gmail.com</p>
+            <p><i class="fa fa-phone"></i> +250782160168</p>
+            <p><i class="fa fa-map-marker-alt"></i> G.S Remera TSS, Rulindo</p>
+        </div>
+        <div class="footer-section">
+              <!-- Follow Us -->
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="https://www.facebook.com/profile.php?id=61587210833693" class="icon fb"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.youtube.com/watch?v=YRhBfL3GEjQ" class="icon yt"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.tiktok.com/@osamathelegend4" class="icon tt"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/hirwaosama10/" class="icon ig"><i class="fab fa-instagram"></i></a>
+            </div>
+             <!-- Admin Panel Button in Footer (NOT fixed) -->
+            <a href="admin.html" class="admin-footer-btn">
+                <i class="fa fa-shield-alt"></i> Admin Dashboard
+            </a>
+        </div>
+        <div class="footer-section">
+            <h3>Location</h3>
+            <iframe src="https://www.google.com/maps?q=G.S+REMERA+TSS+Rulindo+Cyinzuzi&output=embed" style="width: 200px; height: 150px; border: 0; border-radius: 8px;"></iframe>
+        </div>
+    </div>
+    <hr>
+    <div class="copyright">
+        <p>Copyright © 2026 G.S Remera TSS | All Rights Reserved</p>
+    </div>
+</footer>
+
+<script>
+    // Events Data
+    const eventsData = [
+        {
+            id: 1,
+            title: "Academic Year Opening Ceremony",
+            date: "2026-01-15",
+            time: "8:00 AM - 12:00 PM",
+            location: "School Main Hall",
+            description: "Join us for the official opening ceremony of the 2026 academic year. All students, parents, and staff are invited.",
+            fullDescription: "The Academic Year Opening Ceremony marks the beginning of an exciting new academic year. The event will include speeches from the school administration, introduction of new staff members, distribution of academic materials, and cultural performances. Parents are encouraged to attend and meet with class teachers."
+        },
+        {
+            id: 2,
+            title: "Parent-Teacher Conference",
+            date: "2026-02-20",
+            time: "9:00 AM - 4:00 PM",
+            location: "School Classrooms",
+            description: "Quarterly meeting between parents and teachers to discuss student progress.",
+            fullDescription: "This is an important opportunity for parents to meet with teachers and discuss their children's academic progress, behavior, and areas for improvement. Please bring your child's report card and come with any questions or concerns."
+        },
+        {
+            id: 3,
+            title: "Science Exhibition",
+            date: "2026-03-10",
+            time: "10:00 AM - 3:00 PM",
+            location: "Science Laboratory Building",
+            description: "Students showcase their innovative science projects and experiments.",
+            fullDescription: "The annual Science Exhibition features projects from all science classes. Students will present their research findings, demonstrate experiments, and compete for best project awards. Parents and community members are welcome to attend."
+        },
+        {
+            id: 4,
+            title: "Sports Day",
+            date: "2026-04-05",
+            time: "8:00 AM - 5:00 PM",
+            location: "School Playground",
+            description: "Annual sports competition with various athletic events.",
+            fullDescription: "A day of friendly competition featuring track and field events, football matches, volleyball, and traditional games. All students are encouraged to participate. Prizes will be awarded to winners and best-performing classes."
+        },
+        {
+            id: 5,
+            title: "Graduation Ceremony",
+            date: "2026-06-25",
+            time: "10:00 AM - 2:00 PM",
+            location: "School Main Hall",
+            description: "Celebrating the graduation of Senior 6 and TTC Year 3 students.",
+            fullDescription: "The graduation ceremony honors our outgoing students who have successfully completed their studies. The event includes speeches, certificate distribution, and a farewell party. Parents and guardians of graduating students are cordially invited."
+        },
+        {
+            id: 6,
+            title: "Career Day",
+            date: "2026-05-15",
+            time: "9:00 AM - 1:00 PM",
+            location: "School Auditorium",
+            description: "Career guidance session with professionals from various fields.",
+            fullDescription: "Career Day brings together professionals from different industries to speak with students about career opportunities, educational pathways, and workplace expectations. This is a valuable networking opportunity for students to learn about potential careers."
+        }
+    ];
+
+    // Publications Data
+    const publicationsData = [
+        {
+            id: 1,
+            title: "School Academic Calendar 2026",
+            type: "Calendar",
+            date: "January 2026",
+            description: "Complete academic calendar for the 2026 school year including holidays, exams, and events.",
+            downloadLink: "#"
+        },
+        {
+            id: 2,
+            title: "Student Handbook",
+            type: "Handbook",
+            date: "September 2025",
+            description: "Official student handbook containing school rules, policies, and guidelines.",
+            downloadLink: "#"
+        },
+        {
+            id: 3,
+            title: "Quarterly Newsletter - Q1 2026",
+            type: "Newsletter",
+            date: "March 2026",
+            description: "School newsletter featuring student achievements, upcoming events, and important announcements.",
+            downloadLink: "#"
+        },
+        {
+            id: 4,
+            title: "Fee Structure 2026",
+            type: "Fee Schedule",
+            date: "January 2026",
+            description: "Detailed breakdown of school fees for all programs and classes.",
+            downloadLink: "#"
+        },
+        {
+            id: 5,
+            title: "Exam Timetable - Term 1",
+            type: "Timetable",
+            date: "February 2026",
+            description: "Official examination schedule for Term 1 including dates and subjects.",
+            downloadLink: "#"
+        },
+        {
+            id: 6,
+            title: "School Magazine 2025 Edition",
+            type: "Magazine",
+            date: "December 2025",
+            description: "Annual school magazine highlighting student work, school achievements, and memorable moments.",
+            downloadLink: "#"
+        }
+    ];
+
+    // Gallery Data
+    const galleryData = [
+        { id: 1, title: "Science Lab", icon: "fa-flask", caption: "Modern science laboratory facilities" },
+        { id: 2, title: "Computer Lab", icon: "fa-laptop-code", caption: "ICT learning environment" },
+        { id: 3, title: "Library", icon: "fa-book", caption: "Well-stocked school library" },
+        { id: 4, title: "Sports Field", icon: "fa-futbol", caption: "Sports and recreation area" },
+        { id: 5, title: "Classroom", icon: "fa-chalkboard", caption: "Modern classroom setting" },
+        { id: 6, title: "School Events", icon: "fa-calendar", caption: "School cultural events" },
+        { id: 7, title: "Graduation", icon: "fa-graduation-cap", caption: "Graduation ceremony" },
+        { id: 8, title: "Workshops", icon: "fa-users", caption: "Student workshops and seminars" }
+    ];
+
+    // Load Events
+    function loadEvents() {
+        const eventsGrid = document.getElementById('eventsGrid');
+        eventsGrid.innerHTML = eventsData.map(event => {
+            const eventDate = new Date(event.date);
+            const day = eventDate.getDate();
+            const month = eventDate.toLocaleString('default', { month: 'short' });
+            
+            return `
+                <div class="event-card" onclick="showEventDetails(${event.id})">
+                    <div class="event-date">
+                        <div class="day">${day}</div>
+                        <div class="month">${month}</div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">${event.title}</h3>
+                        <div class="event-time"><i class="fa fa-clock"></i> ${event.time}</div>
+                        <div class="event-location"><i class="fa fa-map-marker-alt"></i> ${event.location}</div>
+                        <p class="event-description">${event.description}</p>
+                        <button class="event-btn" onclick="event.stopPropagation(); showEventDetails(${event.id})">View Details <i class="fa fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Load Publications
+    function loadPublications() {
+        const publicationsGrid = document.getElementById('publicationsGrid');
+        publicationsGrid.innerHTML = publicationsData.map(pub => `
+            <div class="publication-card">
+                <div class="publication-icon">
+                    <i class="fa ${pub.type === 'Calendar' ? 'fa-calendar-alt' : pub.type === 'Handbook' ? 'fa-book' : pub.type === 'Newsletter' ? 'fa-newspaper' : pub.type === 'Fee Schedule' ? 'fa-money-bill-wave' : 'fa-file-pdf'}"></i>
+                </div>
+                <div class="publication-content">
+                    <h3 class="publication-title">${pub.title}</h3>
+                    <div class="publication-date"><i class="fa fa-calendar"></i> ${pub.date}</div>
+                    <p class="publication-description">${pub.description}</p>
+                    <button class="download-btn" onclick="downloadPublication('${pub.title}')">
+                        <i class="fa fa-download"></i> Download ${pub.type}
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Load Gallery
+    function loadGallery() {
+        const galleryGrid = document.getElementById('galleryGrid');
+        galleryGrid.innerHTML = galleryData.map(item => `
+            <div class="gallery-item" onclick="showGalleryItem('${item.title}')">
+                <div class="gallery-image">
+                    <i class="fa ${item.icon}"></i>
+                </div>
+                <div class="gallery-caption">
+                    <strong>${item.title}</strong><br>
+                    <small>${item.caption}</small>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Show Event Details Modal
+    function showEventDetails(eventId) {
+        const event = eventsData.find(e => e.id === eventId);
+        if (event) {
+            const eventDate = new Date(event.date);
+            const formattedDate = eventDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            document.getElementById('modalTitle').textContent = event.title;
+            document.getElementById('modalBody').innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <p><strong><i class="fa fa-calendar"></i> Date:</strong> ${formattedDate}</p>
+                    <p><strong><i class="fa fa-clock"></i> Time:</strong> ${event.time}</p>
+                    <p><strong><i class="fa fa-map-marker-alt"></i> Location:</strong> ${event.location}</p>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <h4>Event Description</h4>
+                    <p>${event.fullDescription || event.description}</p>
+                </div>
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                    <button class="event-btn" onclick="closeModal()" style="width: 100%;">Close</button>
+                </div>
+            `;
+            document.getElementById('eventModal').style.display = 'flex';
+            trackEvent('view_event', { event: event.title });
+        }
+    }
+
+    // Download Publication
+    function downloadPublication(title) {
+        alert(`Downloading: ${title}\n\nIn a real implementation, this would download the actual PDF/Word document.`);
+        trackEvent('download_publication', { title: title });
+    }
+
+    // Show Gallery Item
+    function showGalleryItem(title) {
+        alert(`Viewing: ${title}\n\nIn a real implementation, this would open a full-size image viewer.`);
+        trackEvent('view_gallery', { item: title });
+    }
+
+    // Close Modal
+    function closeModal() {
+        document.getElementById('eventModal').style.display = 'none';
+    }
+
+    // Tab Navigation
+    function showTab(tab) {
+        // Update tab buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        // Update sections
+        document.getElementById('eventsSection').classList.remove('active');
+        document.getElementById('publicationsSection').classList.remove('active');
+        document.getElementById('gallerySection').classList.remove('active');
+        
+        if (tab === 'events') {
+            document.getElementById('eventsSection').classList.add('active');
+            trackEvent('view_events_tab', {});
+        } else if (tab === 'publications') {
+            document.getElementById('publicationsSection').classList.add('active');
+            trackEvent('view_publications_tab', {});
+        } else if (tab === 'gallery') {
+            document.getElementById('gallerySection').classList.add('active');
+            trackEvent('view_gallery_tab', {});
+        }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('eventModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Initialize page
+    loadEvents();
+    loadPublications();
+    loadGallery();
+</script>
+
+</body>
+</html>

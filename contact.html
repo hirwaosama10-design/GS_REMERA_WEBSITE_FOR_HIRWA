@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G.S Remera TSS - Contact & My Inbox (Synced with Admin)</title>
+<link rel="icon" type="image/png" href="2.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Activity Tracker Script -->
+<script>
+(function() {
+    const TRACKER_KEY = 'website_activity_data';
+    
+    function initTrackerData() {
+        if (!localStorage.getItem(TRACKER_KEY)) {
+            localStorage.setItem(TRACKER_KEY, JSON.stringify({ 
+                sessions: {}, 
+                events: [], 
+                pageStats: {},
+                startTime: new Date().toISOString() 
+            }));
+        }
+        return JSON.parse(localStorage.getItem(TRACKER_KEY));
+    }
+    
+    function saveTrackerData(data) {
+        localStorage.setItem(TRACKER_KEY, JSON.stringify(data));
+    }
+    
+    function getSessionId() {
+        let sessionId = sessionStorage.getItem('visitor_session_id');
+        if (!sessionId) {
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+            sessionStorage.setItem('visitor_session_id', sessionId);
+            
+            const data = initTrackerData();
+            if (!data.sessions[sessionId]) {
+                data.sessions[sessionId] = {
+                    id: sessionId,
+                    startTime: new Date().toISOString(),
+                    lastActivity: new Date().toISOString(),
+                    pageViews: 0,
+                    clicks: 0,
+                    pages: [],
+                    userAgent: navigator.userAgent,
+                    screenSize: screen.width + 'x' + screen.height
+                };
+                saveTrackerData(data);
+            }
+        }
+        return sessionId;
+    }
+    
+    function trackEvent(type, details) {
+        const data = initTrackerData();
+        const sessionId = getSessionId();
+        
+        if (data.sessions[sessionId]) {
+            if (type === 'pageview') data.sessions[sessionId].pageViews++;
+            if (type === 'click') data.sessions[sessionId].clicks++;
+            if (type === 'form') data.sessions[sessionId].formSubmissions++;
+            data.sessions[sessionId].lastActivity = new Date().toISOString();
+        }
+        
+        data.events.unshift({
+            type: type,
+            details: details,
+            page: window.location.pathname,
+            timestamp: new Date().toISOString(),
+            sessionId: sessionId
+        });
+        
+        if (data.events.length > 500) data.events.pop();
+        saveTrackerData(data);
+    }
+    
+    window.addEventListener('load', () => {
+        trackEvent('pageview', { title: document.title, url: window.location.href });
+    });
+    
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('a, button, .contact-card, .icon, nav a') || e.target;
+        trackEvent('click', { 
+            element: target.tagName, 
+            text: target.innerText?.substring(0, 50)
+        });
+    });
+    
+    console.log('✓ Activity tracker active');
+})();
+</script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Algerian, serif;
+        background: rgb(69, 53, 53);
+        background-size: cover;
+        min-height: 100vh;
+    }
+
+    header {
+        background: rgb(5, 203, 238);
+        font-family: Algerian, serif;
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    header img {
+        height: 80px;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        header img { height: 50px; }
+    }
+
+    nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 10px 15px;
+        transition: 0.3s;
+    }
+
+    nav a:hover, nav a.active {
+        color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+        color: white;
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+    .page-header h1 {
+        font-size: 42px;
+        margin-bottom: 15px;
+    }
+
+    .page-header p {
+        font-size: 18px;
+        opacity: 0.95;
+    }
+
+    .contact-container {
+        max-width: 1200px;
+        margin: 60px auto;
+        padding: 0 20px;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 40px;
+    }
+
+    .contact-info {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .contact-info h2 {
+        color: #0055aa;
+        margin-bottom: 25px;
+        font-size: 24px;
+    }
+
+    .info-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .info-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+    }
+
+    .info-details h3 {
+        color: #333;
+        margin-bottom: 5px;
+        font-size: 16px;
+    }
+
+    .info-details p, .info-details a {
+        color: #666;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .social-links {
+        margin-top: 25px;
+    }
+
+    .social-icons-contact {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .social-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        transition: transform 0.3s;
+        text-decoration: none;
+    }
+
+    .social-icon:hover {
+        transform: scale(1.1);
+    }
+
+    .fb { background: #1877f2; }
+    .yt { background: #ff0000; }
+    .tt { background: #000000; }
+    .ig { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); }
+    .wa { background: #25d366; }
+
+    .contact-form {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .contact-form h2 {
+        color: #0055aa;
+        margin-bottom: 25px;
+        font-size: 24px;
+    }
+
+    /* Email Inbox Section - MATCHES ADMIN PANEL (same localStorage key) */
+    .email-inbox-section {
+        background: linear-gradient(135deg, #f8f9ff, white);
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 50px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        border: 1px solid rgba(5,203,238,0.3);
+    }
+    
+    .email-inbox-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+    
+    .email-inbox-header h2 {
+        color: #0055aa;
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+    
+    .email-inbox-header p {
+        color: #555;
+        font-size: 15px;
+    }
+    
+    .email-lookup-box {
+        background: white;
+        border-radius: 60px;
+        display: flex;
+        flex-wrap: wrap;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border: 1px solid #ddd;
+        max-width: 550px;
+        margin: 0 auto 30px auto;
+    }
+    
+    .email-lookup-box input {
+        flex: 1;
+        padding: 16px 20px;
+        border: none;
+        font-size: 16px;
+        font-family: inherit;
+        outline: none;
+        min-width: 200px;
+    }
+    
+    .email-lookup-box button {
+        background: #0055aa;
+        color: white;
+        border: none;
+        padding: 0 30px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 16px;
+    }
+    
+    .email-lookup-box button:hover {
+        background: rgb(5, 203, 238);
+    }
+    
+    .my-messages-container {
+        background: #fafbfe;
+        border-radius: 20px;
+        padding: 20px;
+        min-height: 200px;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .my-message-card {
+        background: white;
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 18px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-left: 5px solid #0055aa;
+        transition: 0.2s;
+    }
+    
+    .my-message-card.replied-message {
+        border-left-color: #28a745;
+        background: #f0fff4;
+    }
+    
+    .msg-header {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+        font-size: 13px;
+        color: #666;
+    }
+    
+    .msg-subject-line {
+        font-weight: bold;
+        font-size: 18px;
+        color: #1e4663;
+        margin: 8px 0;
+    }
+    
+    .msg-content {
+        background: #f5f7fb;
+        padding: 12px;
+        border-radius: 12px;
+        margin: 12px 0;
+        line-height: 1.5;
+    }
+    
+    .reply-badge {
+        display: inline-block;
+        background: #28a745;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-left: 10px;
+    }
+    
+    .reply-box {
+        background: #e9f7ef;
+        padding: 14px;
+        border-radius: 12px;
+        margin-top: 12px;
+        border-left: 3px solid #28a745;
+    }
+    
+    .reply-label {
+        font-weight: bold;
+        color: #1e7e34;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .reply-text-display {
+        background: white;
+        padding: 10px;
+        border-radius: 10px;
+        margin-top: 5px;
+        line-height: 1.5;
+    }
+    
+    .empty-inbox-message {
+        text-align: center;
+        padding: 50px 20px;
+        color: #888;
+    }
+    
+    .priority-tag {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: bold;
+        background: #eee;
+    }
+    .priority-high { background: #ffe0e0; color: #c00; }
+    .priority-medium { background: #fff3cd; color: #856404; }
+    .priority-low { background: #d4edda; color: #155724; }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+    .priority-group {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 14px;
+        background: #0055aa;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .submit-btn:hover {
+        background: rgb(5, 203, 238);
+        transform: translateY(-2px);
+    }
+
+    .success-message, .error-message, .info-message {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+        text-align: center;
+    }
+    .success-message { background: #d4edda; color: #155724; }
+    .error-message { background: #f8d7da; color: #721c24; }
+    .info-message { background: #d1ecf1; color: #0c5460; }
+
+.staff-card{
+    overflow:hidden;
+}
+
+.staff-avatar img{
+    width:130px;
+    height:130px;
+    object-fit:cover;
+    border-radius:50%;
+    border:5px solid white;
+    box-shadow:0 5px 15px rgba(0,0,0,0.3);
+}
+.map-section, .staff-section {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.map-container iframe {
+    width: 100%;
+    height: 300px;
+    border: 0;
+    border-radius: 12px;
+}
+
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.staff-card {
+    background: blueviolet;
+    padding: 20px;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+    footer {
+        background: rgb(5, 203, 238);
+        color: white;
+        padding: 40px 20px;
+        margin-top: 40px;
+    }
+
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .footer-section {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .footer-section h3 {
+        margin-bottom: 20px;
+        font-size: 18px;
+    }
+
+    .footer-section a {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .footer-section a:hover {
+        text-decoration: underline;
+    }
+
+    .social-icons {
+        display: flex;
+        gap: 12px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .icon {
+        display: inline-flex;
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: white;
+        font-size: 18px;
+        transition: 0.3s;
+    }
+
+    .icon:hover {
+        transform: scale(1.1);
+    }
+
+    .admin-footer-btn {
+        display: inline-block;
+        background: rgb(5, 203, 238);
+        color: rgb(5, 203, 238);
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s;
+        margin-top: 15px;
+        
+    }
+
+    .admin-footer-btn:hover {
+        background:rgb(5, 203, 238);
+        color: rgb(5, 203, 238);
+        transform: scale(1.05);
+    }
+
+    hr {
+        margin: 20px 0;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .copyright {
+        text-align: center;
+        font-size: 12px;
+    }
+
+    @media (max-width: 768px) {
+        .page-header h1 { font-size: 32px; }
+        .staff-grid { grid-template-columns: 1fr; }
+        .footer-content { flex-direction: column; text-align: center; }
+        .social-icons { justify-content: center; }
+        .email-lookup-box { border-radius: 30px; }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <a href="Home.html"><img src="2.png" alt="Logo"></a>
+    <nav>
+        <a href="Home.html">Home</a>
+        <a href="department.html">Department</a>
+        <a href="about.html">About</a>
+        <a href="stakeholder.html">Stakeholders</a>
+        <a href="Accounting.html">Accounting</a>
+        <a href="Marks Portal.html">Marks Portal</a>
+        <a href="event.html">Events</a>
+        <a href="contact.html" class="active">Contact</a>
+    </nav>
+</header>
+
+<div class="page-header">
+    <h1><i class="fa fa-envelope-open-text"></i> Contact & My Inbox</h1>
+    <p>Send a message or enter your email to see replied messages from our team</p>
+</div>
+
+<div class="contact-container">
+    <div class="contact-grid">
+        <!-- Contact Info Sidebar -->
+        <div class="contact-info">
+            <h2><i class="fa fa-address-card"></i> Contact Information</h2>
+            <div class="info-card"><div class="info-icon"><i class="fa fa-map-marker-alt"></i></div><div class="info-details"><h3>Our Location</h3><p>G.S Remera TSS, Rulindo District,<br>Cyinzuzi Sector, Northern Province</p></div></div>
+            <div class="info-card"><div class="info-icon"><i class="fa fa-phone"></i></div><div class="info-details"><h3>Phone Numbers</h3><p>+250 782 160 168</p><p>+250 788 888 888</p></div></div>
+            <div class="info-card"><div class="info-icon"><i class="fa fa-envelope"></i></div><div class="info-details"><h3>Email Addresses</h3><p><a href="mailto:busoro1972@gmail.com">busoro1972@gmail.com</a></p><p><a href="mailto:info@gsremera.edu.rw">info@gsremera.edu.rw</a></p></div></div>
+            <div class="info-card"><div class="info-icon"><i class="fa fa-clock"></i></div><div class="info-details"><h3>Office Hours</h3><p>Monday - Friday: 7:30 AM - 5:00 PM</p><p>Saturday: 8:00 AM - 12:00 PM</p></div></div>
+            <div class="social-links"><h3>Follow Us</h3><div class="social-icons-contact"><a href="#" class="social-icon fb"><i class="fab fa-facebook-f"></i></a><a href="#" class="social-icon yt"><i class="fab fa-youtube"></i></a><a href="#" class="social-icon tt"><i class="fab fa-tiktok"></i></a><a href="#" class="social-icon ig"><i class="fab fa-instagram"></i></a><a href="#" class="social-icon wa"><i class="fab fa-whatsapp"></i></a></div></div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="contact-form">
+            <h2><i class="fa fa-paper-plane"></i> Send New Message</h2>
+            <div id="formSuccess" class="success-message"><i class="fa fa-check-circle"></i> Message sent! Staff will reply soon.</div>
+            <div id="formError" class="error-message"><i class="fa fa-exclamation-circle"></i> Please fill all required fields.</div>
+            <form id="contactForm">
+                <div class="form-group"><label><i class="fa fa-user"></i> Full Name *</label><input type="text" id="fullName" required placeholder="Your name"></div>
+                <div class="form-group"><label><i class="fa fa-envelope"></i> Email Address *</label><input type="email" id="email" required placeholder="your@email.com"></div>
+                <div class="form-group"><label><i class="fa fa-phone"></i> Phone</label><input type="tel" id="phone" placeholder="Optional"></div>
+                <div class="form-group"><label><i class="fa fa-tag"></i> Subject *</label><select id="subject" required><option value="">Select</option><option value="General Inquiry">General Inquiry</option><option value="Admission">Admission</option><option value="Fee Payment">Fee Payment</option><option value="Academic">Academic Issues</option><option value="Complaint">Complaint</option></select></div>
+                <div class="form-group"><label>Priority</label><div class="priority-group"><label><input type="radio" name="priority" value="low" checked> Low</label><label><input type="radio" name="priority" value="medium"> Medium</label><label><input type="radio" name="priority" value="high"> High</label></div></div>
+                <div class="form-group"><label><i class="fa fa-comment"></i> Message *</label><textarea id="message" rows="5" required placeholder="Write your message..."></textarea></div>
+                <button type="submit" class="submit-btn"><i class="fa fa-paper-plane"></i> Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- EMAIL INBOX LOOKUP - FULLY MATCHED WITH ADMIN PANEL (same localStorage key: 'ticket_system_messages') -->
+    <div class="email-inbox-section">
+        <div class="email-inbox-header">
+            <h2><i class="fa fa-inbox"></i> Check Your Messages & Admin Replies</h2>
+            <p>Enter the email address you used to contact us. Any replies made from the <strong>Admin Dashboard</strong> will appear here instantly.</p>
+        </div>
+        
+        <div class="email-lookup-box">
+            <input type="email" id="lookupEmail" placeholder="Enter your email address" autocomplete="off">
+            <button id="checkInboxBtn"><i class="fa fa-search"></i> View My Inbox</button>
+        </div>
+        
+        <div id="myMessagesContainer" class="my-messages-container">
+            <div class="empty-inbox-message">
+                <i class="fa fa-envelope-open-text" style="font-size: 40px; opacity: 0.5;"></i>
+                <p>Enter your email above to see your messages and replied responses from our team.</p>
+                <p style="font-size:13px; margin-top:10px;"><strong>Demo:</strong> Try "student@example.com" (has a replied message from admin)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map & Staff Sections -->
+    <div class="map-section"><h2><i class="fa fa-map"></i> Location</h2><div class="map-container"><iframe src="https://www.google.com/maps?q=G.S+REMERA+TSS+Rulindo+Cyinzuzi&output=embed" allowfullscreen=""></iframe></div></div>
+    <div class="staff-section"><h2><i class="fa fa-user-tie"></i> School Leadership</h2><div class="staff-grid">
+        <div class="staff-card"><div class="staff-avatar"><img src="2.png"></div><div class="staff-info"><h4>Mr. Habimana Jean</h4><p>Headmaster</p></div></div>
+        <div class="staff-card"><div class="staff-avatar"><img src="3.jpg"></div><div class="staff-info"><h4>Mrs. Uwase Marie</h4><p>Director of Studies</p></div></div>
+        <div class="staff-card"><div class="staff-avatar"><img src="1m.jpeg"></div><div class="staff-info"><h4>Mr. Ndayishimiye Eric</h4><p>Bursar</p></div></div>
+        <div class="staff-card"><div class="staff-avatar"><img src="1k.png"></div><div class="staff-info"><h4>Ms. Ingabire Diane</h4><p>Secretary</p></div></div>
+    </div></div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <a href="Home.html"><img src="2.png" alt="Logo" height="200"></a>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="Home.html">Home</a></p>
+            <p><a href="department.html">Department</a></p>
+            <p><a href="stakeholder.html">Stakeholders</a></p>
+            <p><a href="event.html">Events</a></p>
+            <p><a href="contact.html">Contact</a></p>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fa fa-envelope"></i> busoro1972@gmail.com</p>
+            <p><i class="fa fa-phone"></i> +250782160168</p>
+            <p><i class="fa fa-map-marker-alt"></i> G.S Remera TSS, Rulindo</p>
+        </div>
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="#" class="icon fb"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="icon yt"><i class="fab fa-youtube"></i></a>
+                <a href="#" class="icon tt"><i class="fab fa-tiktok"></i></a>
+                <a href="#" class="icon ig"><i class="fab fa-instagram"></i></a>
+            </div>
+            <a href="admin.html" class="admin-footer-btn" style="color: rgb(5, 203, 238);">
+                <i class="fa fa-shield-alt"></i> Admin Dashboard
+            </a>
+        </div>
+        <div class="footer-section">
+            <h3>Location</h3>
+            <iframe src="https://www.google.com/maps?q=G.S+REMERA+TSS+Rulindo+Cyinzuzi&output=embed" style="width: 200px; height: 150px; border: 0; border-radius: 8px;"></iframe>
+        </div>
+    </div>
+    <hr>
+    <div class="copyright">
+        <p>Copyright © 2026 G.S Remera TSS | All Rights Reserved</p>
+    </div>
+</footer>
+
+<script>
+    // ============================================================
+    // MATCHED WITH ADMIN PANEL - SAME localStorage KEY 'ticket_system_messages'
+    // Admin replies (from admin.html) are stored as 'reply' object inside each message.
+    // This page reads the exact same data, ensuring perfect synchronization.
+    // ============================================================
+    
+    const STORAGE_KEY = 'ticket_system_messages';
+    
+    function getAllMessages() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    }
+    
+    function saveMessages(messages) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    }
+    
+    function addNewMessage(msg) {
+        const messages = getAllMessages();
+        messages.unshift(msg);
+        saveMessages(messages);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function renderMessagesByEmail(email) {
+        const container = document.getElementById('myMessagesContainer');
+        if (!email || email.trim() === '') {
+            container.innerHTML = `<div class="empty-inbox-message"><i class="fa fa-envelope"></i> Please enter a valid email address.</div>`;
+            return;
+        }
+        
+        const allMessages = getAllMessages();
+        const userMessages = allMessages.filter(msg => msg.email && msg.email.toLowerCase() === email.toLowerCase());
+        
+        if (userMessages.length === 0) {
+            container.innerHTML = `<div class="empty-inbox-message"><i class="fa fa-info-circle"></i> No messages found for <strong>${escapeHtml(email)}</strong>. Send a message using the form above, and any admin replies will appear here.</div>`;
+            return;
+        }
+        
+        userMessages.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        let html = `<div style="margin-bottom: 15px; padding: 8px 12px; background: #e9ecef; border-radius: 30px; text-align: center;">
+                        <i class="fa fa-envelope"></i> ${userMessages.length} message(s) for <strong>${escapeHtml(email)}</strong> (synced with Admin Dashboard)
+                    </div>`;
+        
+        userMessages.forEach(msg => {
+            const priorityClass = msg.priority === 'high' ? 'priority-high' : (msg.priority === 'medium' ? 'priority-medium' : 'priority-low');
+            const hasReply = msg.reply && msg.reply.text;
+            const repliedClass = hasReply ? 'replied-message' : '';
+            
+            html += `
+                <div class="my-message-card ${repliedClass}">
+                    <div class="msg-header">
+                        <span><i class="fa fa-calendar-alt"></i> ${new Date(msg.timestamp).toLocaleString()}</span>
+                        <span class="priority-tag ${priorityClass}"><i class="fa fa-flag"></i> ${msg.priority.toUpperCase()}</span>
+                    </div>
+                    <div class="msg-subject-line">
+                        <i class="fa fa-tag"></i> ${escapeHtml(msg.subject)}
+                        ${hasReply ? '<span class="reply-badge"><i class="fa fa-check-circle"></i> Replied by Admin</span>' : '<span class="reply-badge" style="background:#6c757d;"><i class="fa fa-clock"></i> Awaiting Admin Reply</span>'}
+                    </div>
+                    <div class="msg-content">
+                        <strong><i class="fa fa-user"></i> ${escapeHtml(msg.name)} wrote:</strong><br>
+                        ${escapeHtml(msg.message)}
+                    </div>
+            `;
+            
+            if (hasReply) {
+                html += `
+                    <div class="reply-box">
+                        <div class="reply-label">
+                            <i class="fa fa-reply-all"></i> <strong>Official Reply from ${escapeHtml(msg.reply.from || 'G.S Remera TSS Admin')}:</strong>
+                        </div>
+                        <div class="reply-text-display">
+                            ${escapeHtml(msg.reply.text)}<br>
+                            <small style="color:#2c662d;"><i class="fa fa-clock"></i> Replied on: ${new Date(msg.reply.repliedAt).toLocaleString()}</small>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html += `<div style="margin-top: 12px; font-size: 13px; color: #856404; background:#fff3cd; padding:10px; border-radius:8px;">
+                            <i class="fa fa-hourglass-half"></i> Your message is pending. Admin will respond from the dashboard.
+                         </div>`;
+            }
+            
+            html += `</div>`;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    // Contact form submission
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('fullName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const subject = document.getElementById('subject').value;
+        const priority = document.querySelector('input[name="priority"]:checked').value;
+        const message = document.getElementById('message').value.trim();
+        
+        if (!name || !email || !subject || !message) {
+            document.getElementById('formError').style.display = 'block';
+            setTimeout(() => { document.getElementById('formError').style.display = 'none'; }, 3000);
+            return;
+        }
+        
+        const newMessage = {
+            id: Date.now(),
+            name: name,
+            email: email,
+            phone: phone,
+            subject: subject,
+            priority: priority,
+            message: message,
+            timestamp: new Date().toISOString(),
+            isRead: false,
+            reply: null
+        };
+        
+        addNewMessage(newMessage);
+        
+        if (typeof trackEvent === 'function') {
+            trackEvent('contact_form_submission', { name, subject, priority });
+        }
+        
+        document.getElementById('formSuccess').style.display = 'block';
+        document.getElementById('contactForm').reset();
+        setTimeout(() => { document.getElementById('formSuccess').style.display = 'none'; }, 4000);
+        
+        // Auto-fill lookup email field
+        const lookupField = document.getElementById('lookupEmail');
+        if (lookupField) lookupField.value = email;
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'info-message';
+        infoDiv.style.display = 'block';
+        infoDiv.style.position = 'fixed';
+        infoDiv.style.bottom = '20px';
+        infoDiv.style.right = '20px';
+        infoDiv.style.zIndex = '999';
+        infoDiv.style.padding = '12px 20px';
+        infoDiv.style.borderRadius = '30px';
+        infoDiv.innerHTML = `<i class="fa fa-check-circle"></i> Message sent! Use "View My Inbox" with ${email} to see admin replies later.`;
+        document.body.appendChild(infoDiv);
+        setTimeout(() => infoDiv.remove(), 5000);
+    });
+    
+    // Check inbox button
+    document.getElementById('checkInboxBtn').addEventListener('click', function() {
+        const email = document.getElementById('lookupEmail').value.trim();
+        if (!email) {
+            document.getElementById('myMessagesContainer').innerHTML = `<div class="empty-inbox-message"><i class="fa fa-exclamation-triangle"></i> Please enter your email address to view messages.</div>`;
+            return;
+        }
+        renderMessagesByEmail(email);
+        if (typeof trackEvent === 'function') trackEvent('inbox_lookup', { email });
+    });
+    
+    // Enter key support
+    document.getElementById('lookupEmail').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') document.getElementById('checkInboxBtn').click();
+    });
+    
+    // Seed demo replied message (shows how admin replies appear - MATCHES admin.html structure)
+    function seedDemoRepliedMessage() {
+        const messages = getAllMessages();
+        const hasDemo = messages.some(m => m.email === 'student@example.com' && m.reply);
+        if (!hasDemo) {
+            const demoMsg = {
+                id: 999999,
+                name: "Demo Student",
+                email: "student@example.com",
+                phone: "0788000000",
+                subject: "Admission Requirements",
+                priority: "medium",
+                message: "Hello, I would like to know the requirements for joining senior secondary at G.S Remera TSS.",
+                timestamp: new Date(Date.now() - 2*24*60*60*1000).toISOString(),
+                isRead: true,
+                reply: {
+                    text: "Dear Student, thank you for reaching out. Admission requirements include: completed O-Level certificate, application letter, and pass interview. Please visit our admission office or email admission@gsremera.edu.rw for more details. Best regards, G.S Remera TSS Administration.",
+                    repliedAt: new Date(Date.now() - 1*24*60*60*1000).toISOString(),
+                    from: "Admin (G.S Remera TSS)"
+                }
+            };
+            messages.unshift(demoMsg);
+            saveMessages(messages);
+        }
+    }
+    seedDemoRepliedMessage();
+</script>
+</body>
+</html>

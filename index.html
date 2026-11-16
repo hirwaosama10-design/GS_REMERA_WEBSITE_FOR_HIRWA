@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G.S Remera TSS - Home</title>
+<link rel="icon" type="image/png" href="2.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Activity Tracker Script -->
+<script>
+// Website Activity Tracker - Records all user activity for admin panel
+(function() {
+    const TRACKER_KEY = 'website_activity_data';
+    
+    function initTrackerData() {
+        if (!localStorage.getItem(TRACKER_KEY)) {
+            localStorage.setItem(TRACKER_KEY, JSON.stringify({ 
+                sessions: {}, 
+                events: [], 
+                pageStats: {},
+                startTime: new Date().toISOString() 
+            }));
+        }
+        return JSON.parse(localStorage.getItem(TRACKER_KEY));
+    }
+    
+    function saveTrackerData(data) {
+        localStorage.setItem(TRACKER_KEY, JSON.stringify(data));
+    }
+    
+    function getSessionId() {
+        let sessionId = sessionStorage.getItem('visitor_session_id');
+        if (!sessionId) {
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+            sessionStorage.setItem('visitor_session_id', sessionId);
+            
+            const data = initTrackerData();
+            if (!data.sessions[sessionId]) {
+                data.sessions[sessionId] = {
+                    id: sessionId,
+                    startTime: new Date().toISOString(),
+                    lastActivity: new Date().toISOString(),
+                    pageViews: 0,
+                    clicks: 0,
+                    formSubmissions: 0,
+                    pages: [],
+                    userAgent: navigator.userAgent,
+                    screenSize: screen.width + 'x' + screen.height
+                };
+                saveTrackerData(data);
+            }
+        }
+        return sessionId;
+    }
+    
+    function trackEvent(type, details) {
+        const data = initTrackerData();
+        const sessionId = getSessionId();
+        
+        if (data.sessions[sessionId]) {
+            if (type === 'pageview') data.sessions[sessionId].pageViews++;
+            if (type === 'click') data.sessions[sessionId].clicks++;
+            if (type === 'form') data.sessions[sessionId].formSubmissions++;
+            data.sessions[sessionId].lastActivity = new Date().toISOString();
+            if (type === 'pageview') {
+                data.sessions[sessionId].pages.push({
+                    url: window.location.pathname,
+                    title: document.title,
+                    time: new Date().toISOString()
+                });
+            }
+        }
+        
+        data.events.unshift({
+            type: type,
+            details: details,
+            page: window.location.pathname,
+            timestamp: new Date().toISOString(),
+            sessionId: sessionId
+        });
+        
+        if (data.events.length > 500) data.events.pop();
+        saveTrackerData(data);
+    }
+    
+    // Track page view when loaded
+    window.addEventListener('load', () => {
+        trackEvent('pageview', { title: document.title, url: window.location.href, loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart });
+    });
+    
+    // Track all clicks
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('a, button, .card, .icon, nav a, .service-btn, .admin-link') || e.target;
+        trackEvent('click', { 
+            element: target.tagName, 
+            text: target.innerText?.substring(0, 50),
+            id: target.id,
+            href: target.href
+        });
+    });
+    
+    // Track form submissions
+    document.addEventListener('submit', (e) => {
+        const form = e.target;
+        const formData = {};
+        new FormData(form).forEach((value, key) => {
+            if (key !== 'password') formData[key] = value;
+        });
+        trackEvent('form', { formId: form.id || 'contact_form', data: formData });
+    });
+    
+    // Track scroll depth
+    let maxScroll = 0;
+    let thresholdsReached = new Set();
+    window.addEventListener('scroll', () => {
+        const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+        if (scrollPercent > maxScroll) {
+            maxScroll = scrollPercent;
+            [25, 50, 75, 100].forEach(threshold => {
+                if (scrollPercent >= threshold && !thresholdsReached.has(threshold)) {
+                    thresholdsReached.add(threshold);
+                    trackEvent('scroll', { percent: threshold });
+                }
+            });
+        }
+    });
+    
+    // Track time on page (heartbeat every 30 seconds)
+    let timeOnPage = 0;
+    setInterval(() => {
+        timeOnPage += 30;
+        trackEvent('time_on_page', { seconds: timeOnPage });
+    }, 30000);
+    
+    // Track exit intent
+    document.addEventListener('mouseleave', (e) => {
+        if (e.clientY <= 0) {
+            trackEvent('exit_intent', { timeOnPage: timeOnPage });
+        }
+    });
+    
+    console.log('✓ Activity tracker active - Admin can see all activity');
+})();
+</script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+         font-family: Algerian, serif;
+        background: rgb(69, 53, 53);
+        background-size: cover;
+        min-height: 100vh;
+    }
+
+
+html, body {
+    height: 100%;
+    font-family: Algerian, serif;
+}
+
+
+header {
+    width: 1300px;
+    height: 480px;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* BACKGROUND IMAGE */
+.bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+/* CONTENT */
+.content {
+    position: relative;
+    z-index: 1;
+}
+
+/* VIDEO BACKGROUND */
+.bg-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1300px;
+    height: 500px;
+    object-fit: cover;   /* KEY FIX */
+    object-position: center;
+    z-index: -2;
+}
+
+/* DARK OVERLAY */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+}
+
+/* TOP BAR */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    z-index: 2;
+}
+
+.top-bar img {
+    height: 80px;
+}
+
+/* NAV */
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: 0.3s;
+}
+
+  nav a:hover {    color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+
+
+/* HERO SECTION */
+.hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 2;
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 20px;
+}
+
+/* CLOCK */
+.clock {
+    margin-top: 15px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 30px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 32px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .top-bar {
+        padding: 10px 20px;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+/* FLOATING SIDEBAR */
+.floating-sidebar {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+/* ITEM */
+.sidebar-item {
+    width: 70px;
+    height: 64px;
+    background: rgb(5, 203, 238);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 40px 0 0 40px;
+    text-decoration: none;
+    transition: 0.35s ease;
+    box-shadow: -4px 2px 12px rgba(0,0,0,0.15);
+}
+
+/* HOVER EXPAND */
+.sidebar-item:hover {
+    width: 220px;
+}
+
+/* ICON */
+.icon-circle {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    border: 2px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+}
+
+/* SVG ICON */
+.icon-circle svg {
+    width: 22px;
+    height: 22px;
+    stroke: white;
+    fill: none;
+    stroke-width: 2;
+}
+
+/* TEXT */
+.sidebar-text {
+    color: white;
+    font-weight: bold;
+    margin-left: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+/* SHOW TEXT ON HOVER */
+.sidebar-item:hover .sidebar-text {
+    opacity: 1;
+}
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Sections */
+    .section {
+        padding: 50px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .section-title {
+        text-align: center;
+        color: #0055aa;
+        font-size: 32px;
+        margin-bottom: 40px;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 3px;
+        background: rgb(5, 203, 238);
+        margin: 15px auto 0;
+        border-radius: 2px;
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .card:hover img {
+        transform: scale(1.05);
+    }
+
+    .card-content {
+        padding: 20px;
+    }
+
+    .card h3 {
+        color: #0055aa;
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+
+    .card p {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    /* Center Box */
+    .center-box {
+        text-align: center;
+        margin: 30px 0;
+    }
+
+    .service-btn {
+        display: inline-block;
+        padding: 15px 40px;
+        background: #0055aa;
+        color: white;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: bold;
+        transition: all 0.3s;
+        font-size: 18px;
+    }
+
+    .service-btn:hover {
+        background: rgb(5, 203, 238);
+        transform: scale(1.05);
+    }
+
+    /* Mission Vision Section */
+    .mv-section {
+        background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+        padding: 60px 20px;
+        margin: 40px 0;
+    }
+
+    .mv-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        gap: 40px;
+        flex-wrap: wrap;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .mv-card {
+        flex: 1;
+        min-width: 280px;
+        background: white;
+        padding: 35px;
+        border-radius: 20px;
+        text-align: center;
+        transition: transform 0.3s;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .mv-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .mv-card h3 {
+        color: #0055aa;
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+
+    .mv-card p {
+        color: #555;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    .mv-card i {
+        font-size: 50px;
+        color: rgb(5, 203, 238);
+        margin-bottom: 20px;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        background: #f0f2f5;
+        padding: 50px 20px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 30px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: transform 0.3s;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-3px);
+    }
+
+    .stat-number {
+        font-size: 42px;
+        font-weight: bold;
+        color: #0055aa;
+    }
+
+    .stat-label {
+        color: #666;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    /* Clock */
+    .clock {
+        margin-top: 20px;
+        font-size: 16px;
+        background: rgba(0,0,0,0.3);
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 30px;
+    }
+
+  /* Admin Link Button in Footer */
+    .admin-footer-btn {
+        display: inline-block;
+        background: rgb(5, 203, 238);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s;
+        margin-top: 15px;
+        border: none;
+    }
+
+    .admin-footer-btn:hover {
+        background: white;
+        color: rgb(5, 203, 238);
+        transform: scale(1.05);
+    }
+
+    /* Footer */
+    footer {
+        background: rgb(5, 203, 238);
+        color: white;
+        padding: 40px 20px;
+        margin-top: 40px;
+    }
+
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .footer-section {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .footer-section h3 {
+        margin-bottom: 20px;
+        font-size: 18px;
+        position: relative;
+    }
+
+    .footer-section h3::after {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 2px;
+        background: white;
+        margin-top: 8px;
+    }
+
+    .footer-section p, .footer-section a {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .footer-section a:hover {
+        text-decoration: underline;
+    }
+
+    /* Social Icons */
+    .social-icons {
+        display: flex;
+        gap: 12px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .icon {
+        display: inline-flex;
+        width: 45px;
+        height: 45px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: white;
+        font-size: 20px;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+
+    .fb { background: #1877f2; }
+    .yt { background: #ff0000; }
+    .tt { background: #000000; }
+    .ig { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); }
+
+    .icon:hover {
+        transform: scale(1.1);
+        opacity: 0.9;
+    }
+
+    hr {
+        margin: 20px 0;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .copyright {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero h1 { font-size: 32px; }
+        .hero p { font-size: 16px; }
+        .section-title { font-size: 24px; }
+        .mv-card h3 { font-size: 22px; }
+        .stat-number { font-size: 32px; }
+        .footer-content { flex-direction: column; text-align: center; }
+        .social-icons { justify-content: center; }
+        .footer-section h3::after { margin-left: auto; margin-right: auto; }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <!-- VIDEO BACKGROUND -->
+    <video autoplay muted loop playsinline class="bg-video">
+        <source src="VIDEO.mp4" type="video/mp4">
+    </video>
+
+    <!-- OVERLAY CONTENT -->
+    <div class="overlay">
+        
+        <!-- TOP NAV (LOGO + MENU) -->
+        <div class="top-bar">
+            <a href="Home.html">
+                <img src="2.png" alt="Logo">
+            </a>
+
+            <nav>
+                <a href="Home.html" class="active">Home</a>
+                <a href="department.html">Department</a>
+                <a href="about.html">About</a>
+                <a href="stakeholder.html">Stakeholders</a>
+                <a href="accounting.html">Accounting</a>
+                <a href="marks portal.html">Marks Portal</a>
+                <a href="event.html">Events</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+        </div>
+
+        <!-- HERO SECTION INSIDE HEADER -->
+        <div class="hero">
+            <h1>Welcome to G.S Remera TSS</h1>
+            <p>Quality Education for a Bright Future</p>
+
+            <div class="clock" id="liveClock">
+                Loading...
+            </div>
+        </div>
+
+    </div>
+</header>
+<div class="floating-sidebar">
+  <a href="https://google.com" class="sidebar-item"><div class="icon-circle"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><span class="sidebar-text">Inquire</span></a>
+  <a href="https://apply.google.com" class="sidebar-item"><div class="icon-circle"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><span class="sidebar-text">Apply</span></a>
+  <a href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox" class="sidebar-item"><div class="icon-circle"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16"/><polyline points="22 7 12 13 2 7"/></svg></div><span class="sidebar-text">Email</span></a>
+  <a href="https//:whatsapp.com" class="sidebar-item"><div class="icon-circle"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.35 1.76.68 2.57a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.51-1.25a2 2 0 0 1 2.11-.45c.81.33 1.67.56 2.57.68A2 2 0 0 1 22 16.92z"/></svg></div><span class="sidebar-text">WhatsApp</span></a>
+</div>
+
+<!-- Programs Section -->
+<div class="section">
+    <h2 class="section-title">Our Programs</h2>
+    <div class="cards-grid">
+        <div class="card">
+            <img src="14.jpeg" alt="Technical School" onerror="this.src='https://via.placeholder.com/300x200?text=Technical+School'">
+            <div class="card-content">
+                <h3><i class="fa fa-tools"></i> Technical Secondary School</h3>
+                <p>We offer quality technical education for students in various fields like electricity, mechanics, and ICT.</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="6.jpeg" alt="General Education" onerror="this.src='https://via.placeholder.com/300x200?text=General+Education'">
+            <div class="card-content">
+                <h3><i class="fa fa-book"></i> Secondary General Education</h3>
+                <p>Strong science and arts studies for future professionals with comprehensive curriculum.</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="15.jpeg" alt="Primary School" onerror="this.src='https://via.placeholder.com/300x200?text=Primary+School'">
+            <div class="card-content">
+                <h3><i class="fa fa-chalkboard"></i> Primary School</h3>
+                <p>We teach public studies with focus on foundational skills and character development.</p>
+            </div>
+        </div>
+        <div class="card">
+            <img src="iii.jpeg" alt="Nursery School" onerror="this.src='https://via.placeholder.com/300x200?text=Nursery+School'">
+            <div class="card-content">
+                <h3><i class="fa fa-child"></i> Nursery School</h3>
+                <p>Building strong foundation for young learners through play-based learning activities.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Services Button -->
+<div class="center-box">
+    <a href="our service.html" class="service-btn">
+        <i class="fa fa-arrow-right"></i> View Our Services
+    </a>
+</div>
+
+<!-- Mission & Vision Section -->
+<div class="mv-section">
+    <div class="mv-wrapper">
+        <div class="mv-card">
+            <i class="fa fa-bullseye"></i>
+            <h3>Our Mission</h3>
+            <p>To teach for sustainable development by providing quality education that empowers students with knowledge, skills, and values for lifelong success and community contribution.</p>
+        </div>
+        <div class="mv-card">
+            <i class="fa fa-eye"></i>
+            <h3>Our Vision</h3>
+            <p>Education for development - To be a center of excellence in education, producing competent graduates who contribute to national and global development.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="stats-section">
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-number" data-target="500">0+</div>
+            <div class="stat-label"><i class="fa fa-users"></i> Students Enrolled</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-target="50">0+</div>
+            <div class="stat-label"><i class="fa fa-chalkboard-teacher"></i> Qualified Teachers</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-target="15">0+</div>
+            <div class="stat-label"><i class="fa fa-graduation-cap"></i> Programs Offered</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-target="10">0+</div>
+            <div class="stat-label"><i class="fa fa-calendar"></i> Years of Excellence</div>
+        </div>
+    </div>
+</div>
+
+<!-- Infographic Link -->
+<div class="center-box">
+    <a href="infographic.html" class="service-btn" style="background: #28a745;">
+        <i class="fa fa-chart-bar"></i> View Infographic
+    </a>
+</div>
+
+
+<footer>
+    <div class="footer-content">
+        <!-- Logo Section -->
+        <div class="footer-section">
+            <a href="home.html">
+                <img src="2.png" alt="Logo" height="200">
+            </a>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="Home.html">Home</a></p>
+            <p><a href="department.html">Department</a></p>
+            <p><a href="stakeholder.html">Stakeholders</a></p>
+            <p><a href="event.html">Events</a></p>
+            <p><a href="contact.html">Contact</a></p>
+            <p><a href="organisation.html">Organization</a></p>
+        </div>
+
+        <!-- Contact Us -->
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fa fa-envelope"></i> busoro1972@gmail.com</p>
+            <p><i class="fa fa-phone"></i> +250782160168</p>
+            <p><i class="fa fa-map-marker-alt"></i> G.S Remera TSS, Rulindo</p>
+            <p><i class="fa fa-clock"></i> Mon-Fri: 7:30 AM - 5:00 PM</p>
+        </div>
+
+        <!-- Follow Us -->
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="https://www.facebook.com/profile.php?id=61587210833693" class="icon fb"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.youtube.com/watch?v=YRhBfL3GEjQ" class="icon yt"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.tiktok.com/@osamathelegend4" class="icon tt"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/hirwaosama10/" class="icon ig"><i class="fab fa-instagram"></i></a>
+            </div>
+             <!-- Admin Panel Button in Footer (NOT fixed) -->
+            <a href="admin.html" class="admin-footer-btn">
+                <i class="fa fa-shield-alt"></i> Admin Dashboard
+            </a>
+        </div>
+
+        <!-- Location -->
+        <div class="footer-section">
+            <h3>Location</h3>
+            <iframe 
+                src="https://www.google.com/maps?q=G.S+REMERA+TSS+Rulindo+Cyinzuzi&output=embed"
+                allowfullscreen=""
+                loading="lazy" 
+                style="width: 200px; height: 150px; border: 0; border-radius: 8px;">
+            </iframe>
+        </div>
+    </div>
+    <hr>
+    <div class="copyright">
+        <p>Copyright © 2026 G.S Remera TSS | All Rights Reserved</p>
+        <p style="margin-top: 5px;">Education for Development</p>
+    </div>
+</footer>
+
+<script>
+    // Live Clock Function
+    function updateClock() {
+        let now = new Date();
+        let hours = now.getHours().toString().padStart(2, '0');
+        let minutes = now.getMinutes().toString().padStart(2, '0');
+        let seconds = now.getSeconds().toString().padStart(2, '0');
+        let timeString = hours + ":" + minutes + ":" + seconds;
+        
+        let clockElement = document.getElementById("liveClock");
+        if (clockElement) {
+            clockElement.innerHTML = '<i class="fa fa-clock"></i> ' + timeString + ' | <i class="fa fa-calendar"></i> ' + now.toLocaleDateString();
+        }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Animate Statistics on Scroll
+    const observerOptions = { threshold: 0.5, rootMargin: "0px" };
+    
+    const animateNumbers = (element) => {
+        const target = parseInt(element.getAttribute('data-target'));
+        let current = 0;
+        const increment = target / 50;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.innerText = target + '+';
+                clearInterval(timer);
+            } else {
+                element.innerText = Math.floor(current) + '+';
+            }
+        }, 30);
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const numbers = entry.target.querySelectorAll('.stat-number');
+                numbers.forEach(num => animateNumbers(num));
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+    
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) observer.observe(statsSection);
+
+    // Add active class to current nav item
+    const currentLocation = window.location.pathname;
+    const navLinks = document.querySelectorAll('nav a');
+    navLinks.forEach(link => {
+        if (link.getAttribute('href') === 'Home.html' || (currentLocation === '/' && link.getAttribute('href') === 'Home.html')) {
+            link.classList.add('active');
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G.S Remera TSS - Stakeholders</title>
+<link rel="icon" type="image/png" href="2.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Activity Tracker Script -->
+<script>
+// Website Activity Tracker
+(function() {
+    const TRACKER_KEY = 'website_activity_data';
+    
+    function initTrackerData() {
+        if (!localStorage.getItem(TRACKER_KEY)) {
+            localStorage.setItem(TRACKER_KEY, JSON.stringify({ 
+                sessions: {}, 
+                events: [], 
+                pageStats: {},
+                startTime: new Date().toISOString() 
+            }));
+        }
+        return JSON.parse(localStorage.getItem(TRACKER_KEY));
+    }
+    
+    function saveTrackerData(data) {
+        localStorage.setItem(TRACKER_KEY, JSON.stringify(data));
+    }
+    
+    function getSessionId() {
+        let sessionId = sessionStorage.getItem('visitor_session_id');
+        if (!sessionId) {
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+            sessionStorage.setItem('visitor_session_id', sessionId);
+            
+            const data = initTrackerData();
+            if (!data.sessions[sessionId]) {
+                data.sessions[sessionId] = {
+                    id: sessionId,
+                    startTime: new Date().toISOString(),
+                    lastActivity: new Date().toISOString(),
+                    pageViews: 0,
+                    clicks: 0,
+                    pages: [],
+                    userAgent: navigator.userAgent,
+                    screenSize: screen.width + 'x' + screen.height
+                };
+                saveTrackerData(data);
+            }
+        }
+        return sessionId;
+    }
+    
+    function trackEvent(type, details) {
+        const data = initTrackerData();
+        const sessionId = getSessionId();
+        
+        if (data.sessions[sessionId]) {
+            if (type === 'pageview') data.sessions[sessionId].pageViews++;
+            if (type === 'click') data.sessions[sessionId].clicks++;
+            data.sessions[sessionId].lastActivity = new Date().toISOString();
+        }
+        
+        data.events.unshift({
+            type: type,
+            details: details,
+            page: window.location.pathname,
+            timestamp: new Date().toISOString(),
+            sessionId: sessionId
+        });
+        
+        if (data.events.length > 500) data.events.pop();
+        saveTrackerData(data);
+    }
+    
+    window.addEventListener('load', () => {
+        trackEvent('pageview', { title: document.title, url: window.location.href });
+    });
+    
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('a, button, .stake-card, .icon, nav a') || e.target;
+        trackEvent('click', { 
+            element: target.tagName, 
+            text: target.innerText?.substring(0, 50),
+            id: target.id
+        });
+    });
+    
+    console.log('✓ Activity tracker active');
+})();
+</script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+         font-family: Algerian, serif;
+        background: rgb(69, 53, 53);
+        background-size: cover;
+        min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+        background: rgb(5, 203, 238);
+        font-family: Algerian, serif;
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    header img {
+        height: 80px;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        header img { height: 50px; }
+        header div { font-size: 18px !important; }
+    }
+
+  /* NAV */
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: 0.3s;
+}
+
+   nav a:hover {    color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+
+    nav a.active {
+        color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+    /* Page Header */
+    .page-header {
+        background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+        color: white;
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+    .page-header h1 {
+        font-size: 42px;
+        margin-bottom: 15px;
+    }
+
+    .page-header p {
+        font-size: 18px;
+        opacity: 0.95;
+    }
+
+    /* Stakeholders Section */
+    .stakeholders-section {
+        padding: 60px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .section-title {
+        text-align: center;
+        color: #0055aa;
+        font-size: 32px;
+        margin-bottom: 40px;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 3px;
+        background: rgb(5, 203, 238);
+        margin: 15px auto 0;
+        border-radius: 2px;
+    }
+
+    .stakeholders-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    .stake-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+    }
+
+    .stake-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .stake-header {
+        background: linear-gradient(135deg, #0055aa, #0073e6);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .stake-header i {
+        font-size: 50px;
+        margin-bottom: 15px;
+    }
+
+    .stake-header h3 {
+        font-size: 22px;
+        margin: 0;
+    }
+
+    .stake-content {
+        padding: 25px;
+    }
+
+    .stake-content p {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .stake-list {
+        list-style: none;
+        margin: 15px 0;
+    }
+
+    .stake-list li {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        color: #555;
+        font-size: 14px;
+    }
+
+    .stake-list li i {
+        color: #0055aa;
+        margin-right: 10px;
+        width: 20px;
+    }
+
+    .stake-list li strong {
+        color: #0055aa;
+    }
+
+    .contact-info {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+
+    .contact-info p {
+        font-size: 13px;
+        margin: 5px 0;
+    }
+
+    .contact-info i {
+        color: #0055aa;
+        width: 25px;
+    }
+
+    /* Message Form Section */
+    .message-section {
+        background: #f0f2f5;
+        padding: 60px 20px;
+    }
+
+    .message-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .message-container h3 {
+        color: #0055aa;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 28px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #0055aa;
+        box-shadow: 0 0 0 3px rgba(0,85,170,0.1);
+    }
+
+    .priority-group {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .priority-group label {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: normal;
+        cursor: pointer;
+    }
+
+    .submit-btn {
+        background: #0055aa;
+        color: white;
+        padding: 14px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 100%;
+    }
+
+    .submit-btn:hover {
+        background: rgb(5, 203, 238);
+        transform: translateY(-2px);
+    }
+
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+        text-align: center;
+    }
+
+    /* Footer */
+    footer {
+        background: rgb(5, 203, 238);
+        color: white;
+        padding: 40px 20px;
+        margin-top: 40px;
+    }
+
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .footer-section {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .footer-section h3 {
+        margin-bottom: 20px;
+        font-size: 18px;
+    }
+
+    .footer-section a {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .footer-section a:hover {
+        text-decoration: underline;
+    }
+
+    .social-icons {
+        display: flex;
+        gap: 12px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .icon {
+        display: inline-flex;
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: white;
+        font-size: 18px;
+        transition: 0.3s;
+    }
+
+    .fb { background: #1877f2; }
+    .yt { background: #ff0000; }
+    .tt { background: #000000; }
+    .ig { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); }
+
+    .icon:hover {
+        transform: scale(1.1);
+    }
+
+    hr {
+        margin: 20px 0;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .copyright {
+        text-align: center;
+        font-size: 12px;
+    }
+
+  /* Admin Link Button in Footer */
+    .admin-footer-btn {
+        display: inline-block;
+        background: rgb(5, 203, 238);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s;
+        margin-top: 15px;
+        border: none;
+    }
+
+    .admin-footer-btn:hover {
+        background: white;
+        color: rgb(5, 203, 238);
+        transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+        .page-header h1 { font-size: 32px; }
+        .stakeholders-grid { grid-template-columns: 1fr; }
+        .message-container { padding: 25px; }
+        .footer-content { flex-direction: column; text-align: center; }
+        .social-icons { justify-content: center; }
+        .priority-group { flex-direction: column; align-items: flex-start; }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <a href="Home.html">
+        <img src="2.png" alt="Logo" height="80">
+    </a>
+
+<nav>
+    <a href="Home.html">Home</a>
+    <a href="department.html">Department</a>
+     <a href="about.html">About</a>
+    <a href="stakeholder.html">Stakeholders</a>
+    <a href="Accounting.html">Accounting</a>
+    <a href="Marks Portal.html">Marks Portal</a>
+    <a href="event.html">Events</a>
+    <a href="contact.html">Contact</a>
+</nav>
+</header>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1><i class="fa fa-handshake"></i> Our Stakeholders</h1>
+    <p>Working together for quality education and community development</p>
+</div>
+
+<!-- Stakeholders Section -->
+<div class="stakeholders-section">
+    <h2 class="section-title">Key Partners & Stakeholders</h2>
+    <div class="stakeholders-grid">
+        
+        <!-- Stakeholder 1: Parents -->
+        <div class="stake-card">
+            <div class="stake-header">
+                <i class="fa fa-family"></i>
+                <h3>Parents & Guardians</h3>
+            </div>
+            <div class="stake-content">
+                <p>Parents play a vital role in their children's education through active participation and support.</p>
+                <ul class="stake-list">
+                    <li><i class="fa fa-check-circle"></i> Parent-Teacher Meetings</li>
+                    <li><i class="fa fa-check-circle"></i> School Development Committee</li>
+                    <li><i class="fa fa-check-circle"></i> Volunteer Opportunities</li>
+                    <li><i class="fa fa-check-circle"></i> Fee Payment Support</li>
+                </ul>
+                <div class="contact-info">
+                    <p><i class="fa fa-calendar"></i> PTA Meetings: Every 1st Saturday</p>
+                    <p><i class="fa fa-clock"></i> Time: 9:00 AM - 12:00 PM</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stakeholder 2: Government -->
+        <div class="stake-card">
+            <div class="stake-header">
+                <i class="fa fa-landmark"></i>
+                <h3>Government Bodies</h3>
+            </div>
+            <div class="stake-content">
+                <p>Support from various government institutions ensures quality education standards.</p>
+                <ul class="stake-list">
+                    <li><i class="fa fa-graduation-cap"></i> <strong>MINEDUC</strong> - Ministry of Education</li>
+                    <li><i class="fa fa-chalkboard"></i> <strong>REB</strong> - Rwanda Education Board</li>
+                    <li><i class="fa fa-building"></i> <strong>Rulindo District</strong> - Local Government</li>
+                    <li><i class="fa fa-chart-line"></i> <strong>WDA</strong> - Workforce Development Authority</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Stakeholder 3: Teachers & Staff -->
+        <div class="stake-card">
+            <div class="stake-header">
+                <i class="fa fa-chalkboard-user"></i>
+                <h3>Teachers & Staff</h3>
+            </div>
+            <div class="stake-content">
+                <p>Dedicated educators committed to student success and professional development.</p>
+                <ul class="stake-list">
+                    <li><i class="fa fa-user"></i> <strong>50+</strong> Qualified Teachers</li>
+                    <li><i class="fa fa-briefcase"></i> <strong>20+</strong> Support Staff</li>
+                    <li><i class="fa fa-microphone"></i> <strong>Regular Training</strong> Programs</li>
+                    <li><i class="fa fa-star"></i> <strong>Certified</strong> Professionals</li>
+                </ul>
+                <div class="contact-info">
+                    <p><i class="fa fa-envelope"></i> staff@gsremera.edu</p>
+                    <p><i class="fa fa-phone"></i> +250788888888</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stakeholder 4: Students -->
+        <div class="stake-card">
+            <div class="stake-header">
+                <i class="fa fa-users"></i>
+                <h3>Students</h3>
+            </div>
+            <div class="stake-content">
+                <p>Our primary focus - providing quality education and holistic development.</p>
+                <ul class="stake-list">
+                    <li><i class="fa fa-book"></i> <strong>500+</strong> Active Students</li>
+                    <li><i class="fa fa-trophy"></i> Student Clubs & Activities</li>
+                    <li><i class="fa fa-laptop"></i> ICT & Computer Labs</li>
+                    <li><i class="fa fa-futbol"></i> Sports & Recreation</li>
+                </ul>
+                <div class="contact-info">
+                    <p><i class="fa fa-calendar"></i> Student Council Elections: Annual</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stakeholder 5: Alumni -->
+        <div class="stake-card">
+            <div class="stake-header">
+                <i class="fa fa-user-graduate"></i>
+                <h3>Alumni Association</h3>
+            </div>
+            <div class="stake-content">
+                <p>Former students contributing back to their alma mater's development.</p>
+                <ul class="stake-list">
+                    <li><i class="fa fa-globe"></i> Active Alumni Network</li>
+                    <li><i class="fa fa-hand-holding-heart"></i> Scholarship Programs</li>
+                    <li><i class="fa fa-briefcase"></i> Career Mentorship</li>
+                    <li><i class="fa fa-calendar"></i> Annual Reunion Events</li>
+                </ul>
+                <div class="contact-info">
+                    <p><i class="fa fa-envelope"></i> alumni@gsremera.edu</p>
+                    <p><i class="fa fa-facebook"></i> Alumni Facebook Group</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stakeholder 6: Partners -->
+        <div class="stake-card">
+            <div class="stake-header">
+                <i class="fa fa-handshake"></i>
+                <h3>Development Partners</h3>
+            </div>
+            <div class="stake-content">
+                <p>Organizations supporting school infrastructure and programs.</p>
+                <ul class="stake-list">
+                    <li><i class="fa fa-heart"></i> NGO Partnerships</li>
+                    <li><i class="fa fa-building"></i> Private Sector Collaborations</li>
+                    <li><i class="fa fa-globe"></i> International Organizations</li>
+                    <li><i class="fa fa-church"></i> Faith-Based Organizations</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Message Form Section -->
+<div class="message-section">
+    <div class="message-container">
+        <h3><i class="fa fa-comment-dots"></i> Send Message to Stakeholders</h3>
+        <div id="successMessage" class="success-message">
+            <i class="fa fa-check-circle"></i> Your message has been sent successfully!
+        </div>
+        <form id="stakeholderForm">
+            <div class="form-group">
+                <label><i class="fa fa-user"></i> Your Name *</label>
+                <input type="text" id="senderName" required placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label><i class="fa fa-envelope"></i> Your Email *</label>
+                <input type="email" id="senderEmail" required placeholder="Enter your email address">
+            </div>
+            <div class="form-group">
+                <label><i class="fa fa-users"></i> Send To *</label>
+                <select id="recipient" required>
+                    <option value="">Select stakeholder group</option>
+                    <option value="Parents & Guardians">Parents & Guardians</option>
+                    <option value="Government Bodies">Government Bodies</option>
+                    <option value="Teachers & Staff">Teachers & Staff</option>
+                    <option value="Students">Students</option>
+                    <option value="Alumni">Alumni Association</option>
+                    <option value="Development Partners">Development Partners</option>
+                    <option value="School Administration">School Administration</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label><i class="fa fa-tag"></i> Subject *</label>
+                <input type="text" id="subject" required placeholder="Message subject">
+            </div>
+            <div class="form-group">
+                <label><i fa-message"></i> Message *</label>
+                <textarea id="message" rows="5" required placeholder="Type your message here..."></textarea>
+            </div>
+            <div class="form-group">
+                <label><i class="fa fa-flag"></i> Priority</label>
+                <div class="priority-group">
+                    <label><input type="radio" name="priority" value="low" checked> <i class="fa fa-flag-checkered"></i> Low</label>
+                    <label><input type="radio" name="priority" value="medium"> <i class="fa fa-flag"></i> Medium</label>
+                    <label><input type="radio" name="priority" value="high"> <i class="fa fa-flag"></i> High</label>
+                </div>
+            </div>
+            <button type="submit" class="submit-btn">
+                <i class="fa fa-paper-plane"></i> Send Message
+            </button>
+        </form>
+    </div>
+</div>
+
+
+<footer>
+    <div class="footer-content">
+        <!-- Logo Section -->
+        <div class="footer-section">
+            <a href="home.html">
+                <img src="2.png" alt="Logo" height="200">
+            </a>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="Home.html">Home</a></p>
+            <p><a href="department.html">Department</a></p>
+            <p><a href="stakeholder.html">Stakeholders</a></p>
+            <p><a href="event.html">Events</a></p>
+            <p><a href="contact.html">Contact</a></p>
+            <p><a href="organisation.html">Organization</a></p>
+        </div>
+
+        <!-- Contact Us -->
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fa fa-envelope"></i> busoro1972@gmail.com</p>
+            <p><i class="fa fa-phone"></i> +250782160168</p>
+            <p><i class="fa fa-map-marker-alt"></i> G.S Remera TSS, Rulindo</p>
+            <p><i class="fa fa-clock"></i> Mon-Fri: 7:30 AM - 5:00 PM</p>
+        </div>
+
+        <!-- Follow Us -->
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="https://www.facebook.com/profile.php?id=61587210833693" class="icon fb"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.youtube.com/watch?v=YRhBfL3GEjQ" class="icon yt"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.tiktok.com/@osamathelegend4" class="icon tt"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/hirwaosama10/" class="icon ig"><i class="fab fa-instagram"></i></a>
+            </div>
+             <!-- Admin Panel Button in Footer (NOT fixed) -->
+            <a href="admin.html" class="admin-footer-btn">
+                <i class="fa fa-shield-alt"></i> Admin Dashboard
+            </a>
+        </div>
+
+        <!-- Location -->
+        <div class="footer-section">
+            <h3>Location</h3>
+            <iframe 
+                src="https://www.google.com/maps?q=G.S+REMERA+TSS+Rulindo+Cyinzuzi&output=embed"
+                allowfullscreen=""
+                loading="lazy" 
+                style="width: 200px; height: 150px; border: 0; border-radius: 8px;">
+            </iframe>
+        </div>
+    </div>
+    <hr>
+    <div class="copyright">
+        <p>Copyright © 2026 G.S Remera TSS | All Rights Reserved</p>
+        <p style="margin-top: 5px;">Education for Development</p>
+    </div>
+</footer>
+
+<script>
+    // Handle form submission
+    document.getElementById('stakeholderForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const formData = {
+            name: document.getElementById('senderName').value,
+            email: document.getElementById('senderEmail').value,
+            recipient: document.getElementById('recipient').value,
+            subject: document.getElementById('subject').value,
+            message: document.getElementById('message').value,
+            priority: document.querySelector('input[name="priority"]:checked').value,
+            timestamp: new Date().toISOString(),
+            isRead: false,
+            reply: null
+        };
+        
+        // Save to localStorage
+        let messages = JSON.parse(localStorage.getItem('ticket_system_messages') || '[]');
+        messages.push(formData);
+        localStorage.setItem('ticket_system_messages', JSON.stringify(messages));
+        
+        // Track event
+        if (window.trackEvent) {
+            window.trackEvent('form_submission', { form: 'stakeholder_message', recipient: formData.recipient });
+        }
+        
+        // Show success message
+        const successDiv = document.getElementById('successMessage');
+        successDiv.style.display = 'block';
+        
+        // Reset form
+        document.getElementById('stakeholderForm').reset();
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+            successDiv.style.display = 'none';
+        }, 5000);
+        
+        // Scroll to top of form
+        document.querySelector('.message-container').scrollIntoView({ behavior: 'smooth' });
+    });
+</script>
+
+</body>
+</html>

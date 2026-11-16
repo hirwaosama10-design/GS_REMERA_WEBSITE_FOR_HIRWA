@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G.S Remera TSS - Marks Portal</title>
+<link rel="icon" type="image/png" href="2.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Activity Tracker Script -->
+<script>
+(function() {
+    const TRACKER_KEY = 'website_activity_data';
+    
+    function initTrackerData() {
+        if (!localStorage.getItem(TRACKER_KEY)) {
+            localStorage.setItem(TRACKER_KEY, JSON.stringify({ 
+                sessions: {}, 
+                events: [], 
+                pageStats: {},
+                startTime: new Date().toISOString() 
+            }));
+        }
+        return JSON.parse(localStorage.getItem(TRACKER_KEY));
+    }
+    
+    function saveTrackerData(data) {
+        localStorage.setItem(TRACKER_KEY, JSON.stringify(data));
+    }
+    
+    function getSessionId() {
+        let sessionId = sessionStorage.getItem('visitor_session_id');
+        if (!sessionId) {
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+            sessionStorage.setItem('visitor_session_id', sessionId);
+            
+            const data = initTrackerData();
+            if (!data.sessions[sessionId]) {
+                data.sessions[sessionId] = {
+                    id: sessionId,
+                    startTime: new Date().toISOString(),
+                    lastActivity: new Date().toISOString(),
+                    pageViews: 0,
+                    clicks: 0,
+                    pages: [],
+                    userAgent: navigator.userAgent,
+                    screenSize: screen.width + 'x' + screen.height
+                };
+                saveTrackerData(data);
+            }
+        }
+        return sessionId;
+    }
+    
+    function trackEvent(type, details) {
+        const data = initTrackerData();
+        const sessionId = getSessionId();
+        
+        if (data.sessions[sessionId]) {
+            if (type === 'pageview') data.sessions[sessionId].pageViews++;
+            if (type === 'click') data.sessions[sessionId].clicks++;
+            data.sessions[sessionId].lastActivity = new Date().toISOString();
+        }
+        
+        data.events.unshift({
+            type: type,
+            details: details,
+            page: window.location.pathname,
+            timestamp: new Date().toISOString(),
+            sessionId: sessionId
+        });
+        
+        if (data.events.length > 500) data.events.pop();
+        saveTrackerData(data);
+    }
+    
+    window.addEventListener('load', () => {
+        trackEvent('pageview', { title: document.title, url: window.location.href });
+    });
+    
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('a, button, .role-btn, .login-btn, .register-btn, nav a') || e.target;
+        trackEvent('click', { 
+            element: target.tagName, 
+            text: target.innerText?.substring(0, 50)
+        });
+    });
+    
+    console.log('✓ Activity tracker active');
+})();
+</script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Algerian, serif;
+        background: rgb(69, 53, 53);
+        background-size: cover;
+        min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+        background: rgb(5, 203, 238);
+        font-family: Algerian, serif;
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    header img {
+        height: 80px;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        header img { height: 50px; }
+        header div { font-size: 18px !important; }
+    }
+
+  /* NAV */
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: 0.3s;
+}
+
+   nav a:hover {    color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+
+    nav a.active {
+        color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+
+    /* Page Header */
+    .page-header {
+        background: linear-gradient(135deg, #0055aa, rgb(5, 203, 238));
+        color: white;
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+    .page-header h1 {
+        font-size: 42px;
+        margin-bottom: 15px;
+    }
+
+    .page-header p {
+        font-size: 18px;
+        opacity: 0.95;
+    }
+
+    /* Role Selection */
+    .role-container {
+        max-width: 1200px;
+        margin: 60px auto;
+        padding: 0 20px;
+    }
+
+    .role-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+    }
+
+    .role-btn {
+        padding: 20px 40px;
+        font-size: 20px;
+        font-weight: bold;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .role-btn i {
+        font-size: 30px;
+    }
+
+    .role-teacher {
+        background: #0055aa;
+        color: white;
+    }
+
+    .role-teacher:hover {
+        background: #003d80;
+        transform: translateY(-3px);
+    }
+
+    .role-student {
+        background: #28a745;
+        color: white;
+    }
+
+    .role-student:hover {
+        background: #218838;
+        transform: translateY(-3px);
+    }
+
+    .role-active {
+        box-shadow: 0 0 0 3px rgb(5, 203, 238);
+    }
+
+    /* Login Forms */
+    .form-container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: none;
+    }
+
+    .form-container.active {
+        display: block;
+    }
+
+    .form-container h2 {
+        color: #0055aa;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .input-group {
+        margin-bottom: 20px;
+    }
+
+    .input-group label {
+        display: block;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .input-group input, .input-group select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .input-group input:focus, .input-group select:focus {
+        outline: none;
+        border-color: #0055aa;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 14px;
+        background: #0055aa;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .login-btn:hover {
+        background: rgb(5, 203, 238);
+    }
+
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+        text-align: center;
+    }
+
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+        text-align: center;
+    }
+
+    .register-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    .register-link a {
+        color: #0055aa;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    /* Dashboard Common */
+    .dashboard {
+        display: none;
+        max-width: 1200px;
+        margin: 60px auto;
+        padding: 0 20px;
+    }
+
+    .dashboard-header {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .welcome-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .welcome-text h2 {
+        color: #0055aa;
+        margin-bottom: 10px;
+    }
+
+    .logout-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .stat-card i {
+        font-size: 40px;
+        color: #0055aa;
+        margin-bottom: 10px;
+    }
+
+    .stat-card .number {
+        font-size: 32px;
+        font-weight: bold;
+        color: #0055aa;
+    }
+
+    /* Marks Table */
+    .marks-section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        color: #0055aa;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        background: #0055aa;
+        color: white;
+        padding: 12px;
+        text-align: left;
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .grade-A { background: #d4edda; color: #155724; font-weight: bold; }
+    .grade-B { background: #d1ecf1; color: #0c5460; font-weight: bold; }
+    .grade-C { background: #fff3cd; color: #856404; font-weight: bold; }
+    .grade-D { background: #f8d7da; color: #721c24; font-weight: bold; }
+    .grade-F { background: #f5c6cb; color: #721c24; font-weight: bold; }
+
+    .edit-btn {
+        background: #ffc107;
+        color: #333;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 5px;
+    }
+
+    .save-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .cancel-btn {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .marks-input {
+        width: 80px;
+        padding: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+     /* Admin Link Button in Footer */
+    .admin-footer-btn {
+        display: inline-block;
+        background: rgb(5, 203, 238);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s;
+        margin-top: 15px;
+        border: none;
+    }
+
+    .admin-footer-btn:hover {
+        background: white;
+        color: rgb(5, 203, 238);
+        transform: scale(1.05);
+    }
+
+    /* Footer */
+    footer {
+        background: rgb(5, 203, 238);
+        color: white;
+        padding: 40px 20px;
+        margin-top: 40px;
+    }
+
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .footer-section {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .footer-section h3 {
+        margin-bottom: 20px;
+        font-size: 18px;
+    }
+
+    .footer-section a {
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .social-icons {
+        display: flex;
+        gap: 12px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .icon {
+        display: inline-flex;
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: white;
+        font-size: 18px;
+        transition: 0.3s;
+    }
+
+    .fb { background: #1877f2; }
+    .yt { background: #ff0000; }
+    .tt { background: #000000; }
+    .ig { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); }
+
+    .icon:hover {
+        transform: scale(1.1);
+    }
+
+    hr {
+        margin: 20px 0;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .copyright {
+        text-align: center;
+        font-size: 12px;
+    }
+
+    @media (max-width: 768px) {
+        .page-header h1 { font-size: 32px; }
+        .role-btn { padding: 15px 25px; font-size: 16px; }
+        .footer-content { flex-direction: column; text-align: center; }
+        .social-icons { justify-content: center; }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <a href="Home.html">
+        <img src="2.png" alt="Logo" height="80">
+    </a>
+
+<nav>
+    <a href="Home.html">Home</a>
+    <a href="department.html">Department</a>
+     <a href="about.html">About</a>
+    <a href="stakeholder.html">Stakeholders</a>
+    <a href="Accounting.html">Accounting</a>
+    <a href="Marks Portal.html">Marks Portal</a>
+    <a href="event.html">Events</a>
+    <a href="contact.html">Contact</a>
+</nav>
+</header>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1><i class="fa fa-graduation-cap"></i> Marks Portal</h1>
+    <p>Access your academic results | Teachers manage student marks</p>
+</div>
+
+<!-- Role Selection & Login -->
+<div class="role-container" id="roleContainer">
+    <div class="role-buttons">
+        <button class="role-btn role-teacher" onclick="selectRole('teacher')">
+            <i class="fa fa-chalkboard-user"></i> Teacher Login
+        </button>
+        <button class="role-btn role-student" onclick="selectRole('student')">
+            <i class="fa fa-user-graduate"></i> Student Login
+        </button>
+    </div>
+
+    <!-- Teacher Login Form -->
+    <div id="teacherForm" class="form-container">
+        <h2><i class="fa fa-chalkboard-user"></i> Teacher Login</h2>
+        <div id="teacherError" class="error-message"></div>
+        <form id="teacherLoginForm">
+            <div class="input-group">
+                <label><i class="fa fa-user"></i> Teacher ID / Email</label>
+                <input type="text" id="teacherEmail" required placeholder="Enter your email or ID">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-lock"></i> Password</label>
+                <input type="password" id="teacherPassword" required placeholder="Enter password">
+            </div>
+            <button type="submit" class="login-btn"><i class="fa fa-arrow-right"></i> Login as Teacher</button>
+        </form>
+        <div class="register-link">
+            Don't have an account? <a href="#" onclick="showTeacherRegister()">Register as Teacher</a>
+        </div>
+    </div>
+
+    <!-- Teacher Registration Form -->
+    <div id="teacherRegisterForm" class="form-container">
+        <h2><i class="fa fa-user-plus"></i> Teacher Registration</h2>
+        <div id="teacherRegError" class="error-message"></div>
+        <div id="teacherRegSuccess" class="success-message"></div>
+        <form id="teacherRegForm">
+            <div class="input-group">
+                <label><i class="fa fa-user"></i> Full Name</label>
+                <input type="text" id="teacherFullName" required placeholder="Enter full name">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-id-card"></i> Teacher ID</label>
+                <input type="text" id="teacherId" required placeholder="Enter teacher ID">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-envelope"></i> Email Address</label>
+                <input type="email" id="teacherEmailReg" required placeholder="Enter email">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-phone"></i> Phone Number</label>
+                <input type="tel" id="teacherPhone" required placeholder="Enter phone">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-book"></i> Subject Taught</label>
+                <select id="teacherSubject" required>
+                    <option value="">Select subject</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="English">English</option>
+                    <option value="Kinyarwanda">Kinyarwanda</option>
+                    <option value="French">French</option>
+                    <option value="History">History</option>
+                    <option value="Geography">Geography</option>
+                    <option value="Computer Science">Computer Science</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-lock"></i> Password</label>
+                <input type="password" id="teacherRegPassword" required placeholder="Create password">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-lock"></i> Confirm Password</label>
+                <input type="password" id="teacherConfirmPassword" required placeholder="Confirm password">
+            </div>
+            <button type="submit" class="login-btn"><i class="fa fa-check"></i> Register</button>
+        </form>
+        <div class="register-link">
+            Already have an account? <a href="#" onclick="showTeacherLogin()">Login here</a>
+        </div>
+    </div>
+
+    <!-- Student Login Form -->
+    <div id="studentForm" class="form-container">
+        <h2><i class="fa fa-user-graduate"></i> Student Login</h2>
+        <div id="studentError" class="error-message"></div>
+        <form id="studentLoginForm">
+            <div class="input-group">
+                <label><i class="fa fa-id-card"></i> Registration Number</label>
+                <input type="text" id="studentRegNumber" required placeholder="Enter registration number">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-lock"></i> Password</label>
+                <input type="password" id="studentPassword" required placeholder="Enter password">
+            </div>
+            <button type="submit" class="login-btn"><i class="fa fa-arrow-right"></i> Login as Student</button>
+        </form>
+        <div class="register-link">
+            Don't have an account? <a href="#" onclick="showStudentRegister()">Register as Student</a>
+        </div>
+    </div>
+
+    <!-- Student Registration Form -->
+    <div id="studentRegisterForm" class="form-container">
+        <h2><i class="fa fa-user-plus"></i> Student Registration</h2>
+        <div id="studentRegError" class="error-message"></div>
+        <div id="studentRegSuccess" class="success-message"></div>
+        <form id="studentRegForm">
+            <div class="input-group">
+                <label><i class="fa fa-user"></i> Full Name</label>
+                <input type="text" id="studentFullName" required placeholder="Enter full name">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-id-card"></i> Registration Number</label>
+                <input type="text" id="studentRegNum" required placeholder="Enter registration number">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-envelope"></i> Email Address</label>
+                <input type="email" id="studentEmail" required placeholder="Enter email">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-phone"></i> Phone Number</label>
+                <input type="tel" id="studentPhone" required placeholder="Enter phone">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-graduation-cap"></i> Class</label>
+                <select id="studentClass" required>
+                    <option value="">Select class</option>
+                    <option value="S1">Senior 1</option>
+                    <option value="S2">Senior 2</option>
+                    <option value="S3">Senior 3</option>
+                    <option value="S4">Senior 4</option>
+                    <option value="S5">Senior 5</option>
+                    <option value="S6">Senior 6</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-lock"></i> Password</label>
+                <input type="password" id="studentRegPassword" required placeholder="Create password">
+            </div>
+            <div class="input-group">
+                <label><i class="fa fa-lock"></i> Confirm Password</label>
+                <input type="password" id="studentConfirmPassword" required placeholder="Confirm password">
+            </div>
+            <button type="submit" class="login-btn"><i class="fa fa-check"></i> Register</button>
+        </form>
+        <div class="register-link">
+            Already have an account? <a href="#" onclick="showStudentLogin()">Login here</a>
+        </div>
+    </div>
+</div>
+
+<!-- Teacher Dashboard -->
+<div id="teacherDashboard" class="dashboard">
+    <div class="dashboard-header">
+        <div class="welcome-card">
+            <div class="welcome-text">
+                <h2><i class="fa fa-chalkboard-user"></i> Welcome, Teacher <span id="teacherName"></span></h2>
+                <p>Subject: <strong id="teacherSubjectDisplay"></strong> | ID: <strong id="teacherIdDisplay"></strong></p>
+            </div>
+            <button class="logout-btn" onclick="logout('teacher')"><i class="fa fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fa fa-users"></i>
+            <div class="number" id="totalStudents">0</div>
+            <p>Total Students</p>
+        </div>
+        <div class="stat-card">
+            <i class="fa fa-clipboard-list"></i>
+            <div class="number" id="totalSubjects">1</div>
+            <p>Subject Assigned</p>
+        </div>
+        <div class="stat-card">
+            <i class="fa fa-chart-line"></i>
+            <div class="number" id="classAverage">0%</div>
+            <p>Class Average</p>
+        </div>
+    </div>
+
+    <div class="marks-section">
+        <div class="section-title">
+            <h3><i class="fa fa-edit"></i> Manage Student Marks</h3>
+            <div>
+                <select id="classFilter" onchange="loadTeacherMarks()" style="padding: 8px; border-radius: 5px;">
+                    <option value="">All Classes</option>
+                    <option value="S1">Senior 1</option>
+                    <option value="S2">Senior 2</option>
+                    <option value="S3">Senior 3</option>
+                    <option value="S4">Senior 4</option>
+                    <option value="S5">Senior 5</option>
+                    <option value="S6">Senior 6</option>
+                </select>
+                <select id="termFilter" onchange="loadTeacherMarks()" style="padding: 8px; border-radius: 5px; margin-left: 10px;">
+                    <option value="Term 1">Term 1</option>
+                    <option value="Term 2">Term 2</option>
+                    <option value="Term 3">Term 3</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table id="marksTable">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Registration No</th>
+                        <th>Class</th>
+                        <th>Marks (%)</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="marksTableBody">
+                    <tr><td colspan="7" style="text-align: center;">Loading students...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Student Dashboard -->
+<div id="studentDashboard" class="dashboard">
+    <div class="dashboard-header">
+        <div class="welcome-card">
+            <div class="welcome-text">
+                <h2><i class="fa fa-user-graduate"></i> Welcome, <span id="studentNameDisplay"></span></h2>
+                <p>Registration: <strong id="studentRegDisplay"></strong> | Class: <strong id="studentClassDisplay"></strong></p>
+            </div>
+            <button class="logout-btn" onclick="logout('student')"><i class="fa fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <i class="fa fa-chart-line"></i>
+            <div class="number" id="overallAverage">0%</div>
+            <p>Overall Average</p>
+        </div>
+        <div class="stat-card">
+            <i class="fa fa-trophy"></i>
+            <div class="number" id="bestSubject">-</div>
+            <p>Best Subject</p>
+        </div>
+        <div class="stat-card">
+            <i class="fa fa-star"></i>
+            <div class="number" id="performanceGrade">-</div>
+            <p>Performance Grade</p>
+        </div>
+    </div>
+
+    <div class="marks-section">
+        <div class="section-title">
+            <h3><i class="fa fa-chart-simple"></i> Academic Results</h3>
+            <select id="studentTermFilter" onchange="loadStudentMarks()" style="padding: 8px; border-radius: 5px;">
+                <option value="Term 1">Term 1</option>
+                <option value="Term 2">Term 2</option>
+                <option value="Term 3">Term 3</option>
+            </select>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Marks (%)</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody id="studentMarksBody">
+                    <tr><td colspan="5" style="text-align: center;">Loading marks...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <a href="Home.html"><img src="2.png" alt="Logo" height="200"></a>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="Home.html">Home</a></p>
+            <p><a href="department.html">Department</a></p>
+            <p><a href="stakeholder.html">Stakeholders</a></p>
+            <p><a href="event.html">Events</a></p>
+            <p><a href="contact.html">Contact</a></p>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fa fa-envelope"></i> busoro1972@gmail.com</p>
+            <p><i class="fa fa-phone"></i> +250782160168</p>
+            <p><i class="fa fa-map-marker-alt"></i> G.S Remera TSS, Rulindo</p>
+        </div>
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="https://www.facebook.com/profile.php?id=61587210833693" class="icon fb"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.youtube.com/watch?v=YRhBfL3GEjQ" class="icon yt"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.tiktok.com/@osamathelegend4" class="icon tt"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/hirwaosama10/" class="icon ig"><i class="fab fa-instagram"></i></a>
+            </div>
+             <!-- Admin Panel Button in Footer (NOT fixed) -->
+            <a href="admin.html" class="admin-footer-btn">
+                <i class="fa fa-shield-alt"></i> Admin Dashboard
+            </a>
+        </div>
+        <div class="footer-section">
+            <h3>Location</h3>
+            <iframe src="https://www.google.com/maps?q=G.S+REMERA+TSS+Rulindo+Cyinzuzi&output=embed" style="width: 200px; height: 150px; border: 0; border-radius: 8px;"></iframe>
+        </div>
+    </div>
+    <hr>
+    <div class="copyright">
+        <p>Copyright © 2026 G.S Remera TSS | All Rights Reserved</p>
+    </div>
+</footer>
+
+<script>
+    // Data Storage Keys
+    const TEACHERS_KEY = 'marks_teachers';
+    const STUDENTS_KEY = 'marks_students';
+    const MARKS_KEY = 'marks_data';
+
+    // Initialize data
+    function initData() {
+        if (!localStorage.getItem(TEACHERS_KEY)) {
+            // Add default teacher
+            localStorage.setItem(TEACHERS_KEY, JSON.stringify([{
+                id: 'TCH001',
+                fullName: 'John Teacher',
+                email: 'teacher@gsremera.edu',
+                phone: '0788888888',
+                subject: 'Mathematics',
+                password: 'teacher123',
+                registeredDate: new Date().toISOString()
+            }]));
+        }
+        
+        if (!localStorage.getItem(STUDENTS_KEY)) {
+            localStorage.setItem(STUDENTS_KEY, JSON.stringify([{
+                regNumber: '2024001',
+                fullName: 'Demo Student',
+                email: 'student@gsremera.edu',
+                phone: '0788888889',
+                class: 'S4',
+                password: 'student123',
+                registeredDate: new Date().toISOString()
+            }]));
+        }
+        
+        if (!localStorage.getItem(MARKS_KEY)) {
+            localStorage.setItem(MARKS_KEY, JSON.stringify({}));
+        }
+    }
+    
+    initData();
+    
+    let currentRole = null;
+    let currentUser = null;
+    
+    // Role selection
+    function selectRole(role) {
+        currentRole = role;
+        document.querySelectorAll('.form-container').forEach(form => form.classList.remove('active'));
+        
+        if (role === 'teacher') {
+            document.getElementById('teacherForm').classList.add('active');
+        } else {
+            document.getElementById('studentForm').classList.add('active');
+        }
+        
+        document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('role-active'));
+        event.target.classList.add('role-active');
+    }
+    
+    // Teacher Registration
+    function showTeacherRegister() {
+        document.getElementById('teacherForm').classList.remove('active');
+        document.getElementById('teacherRegisterForm').classList.add('active');
+    }
+    
+    function showTeacherLogin() {
+        document.getElementById('teacherRegisterForm').classList.remove('active');
+        document.getElementById('teacherForm').classList.add('active');
+    }
+    
+    document.getElementById('teacherRegForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const password = document.getElementById('teacherRegPassword').value;
+        const confirm = document.getElementById('teacherConfirmPassword').value;
+        
+        if (password !== confirm) {
+            document.getElementById('teacherRegError').textContent = 'Passwords do not match';
+            document.getElementById('teacherRegError').style.display = 'block';
+            return;
+        }
+        
+        const teachers = JSON.parse(localStorage.getItem(TEACHERS_KEY));
+        const newTeacher = {
+            id: document.getElementById('teacherId').value,
+            fullName: document.getElementById('teacherFullName').value,
+            email: document.getElementById('teacherEmailReg').value,
+            phone: document.getElementById('teacherPhone').value,
+            subject: document.getElementById('teacherSubject').value,
+            password: password,
+            registeredDate: new Date().toISOString()
+        };
+        
+        if (teachers.find(t => t.id === newTeacher.id || t.email === newTeacher.email)) {
+            document.getElementById('teacherRegError').textContent = 'Teacher ID or Email already exists';
+            document.getElementById('teacherRegError').style.display = 'block';
+            return;
+        }
+        
+        teachers.push(newTeacher);
+        localStorage.setItem(TEACHERS_KEY, JSON.stringify(teachers));
+        
+        document.getElementById('teacherRegSuccess').textContent = 'Registration successful! Please login.';
+        document.getElementById('teacherRegSuccess').style.display = 'block';
+        
+        setTimeout(() => {
+            showTeacherLogin();
+            document.getElementById('teacherRegForm').reset();
+            document.getElementById('teacherRegSuccess').style.display = 'none';
+        }, 2000);
+    });
+    
+    // Student Registration
+    function showStudentRegister() {
+        document.getElementById('studentForm').classList.remove('active');
+        document.getElementById('studentRegisterForm').classList.add('active');
+    }
+    
+    function showStudentLogin() {
+        document.getElementById('studentRegisterForm').classList.remove('active');
+        document.getElementById('studentForm').classList.add('active');
+    }
+    
+    document.getElementById('studentRegForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const password = document.getElementById('studentRegPassword').value;
+        const confirm = document.getElementById('studentConfirmPassword').value;
+        
+        if (password !== confirm) {
+            document.getElementById('studentRegError').textContent = 'Passwords do not match';
+            document.getElementById('studentRegError').style.display = 'block';
+            return;
+        }
+        
+        const students = JSON.parse(localStorage.getItem(STUDENTS_KEY));
+        const newStudent = {
+            regNumber: document.getElementById('studentRegNum').value,
+            fullName: document.getElementById('studentFullName').value,
+            email: document.getElementById('studentEmail').value,
+            phone: document.getElementById('studentPhone').value,
+            class: document.getElementById('studentClass').value,
+            password: password,
+            registeredDate: new Date().toISOString()
+        };
+        
+        if (students.find(s => s.regNumber === newStudent.regNumber)) {
+            document.getElementById('studentRegError').textContent = 'Registration number already exists';
+            document.getElementById('studentRegError').style.display = 'block';
+            return;
+        }
+        
+        students.push(newStudent);
+        localStorage.setItem(STUDENTS_KEY, JSON.stringify(students));
+        
+        document.getElementById('studentRegSuccess').textContent = 'Registration successful! Please login.';
+        document.getElementById('studentRegSuccess').style.display = 'block';
+        
+        setTimeout(() => {
+            showStudentLogin();
+            document.getElementById('studentRegForm').reset();
+            document.getElementById('studentRegSuccess').style.display = 'none';
+        }, 2000);
+    });
+    
+    // Teacher Login
+    document.getElementById('teacherLoginForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('teacherEmail').value;
+        const password = document.getElementById('teacherPassword').value;
+        
+        const teachers = JSON.parse(localStorage.getItem(TEACHERS_KEY));
+        const teacher = teachers.find(t => (t.email === email || t.id === email) && t.password === password);
+        
+        if (teacher) {
+            currentUser = teacher;
+            sessionStorage.setItem('marks_logged_in', JSON.stringify({ role: 'teacher', id: teacher.id }));
+            showTeacherDashboard();
+            trackEvent('teacher_login', { id: teacher.id });
+        } else {
+            document.getElementById('teacherError').textContent = 'Invalid credentials';
+            document.getElementById('teacherError').style.display = 'block';
+        }
+    });
+    
+    // Student Login
+    document.getElementById('studentLoginForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const regNumber = document.getElementById('studentRegNumber').value;
+        const password = document.getElementById('studentPassword').value;
+        
+        const students = JSON.parse(localStorage.getItem(STUDENTS_KEY));
+        const student = students.find(s => s.regNumber === regNumber && s.password === password);
+        
+        if (student) {
+            currentUser = student;
+            sessionStorage.setItem('marks_logged_in', JSON.stringify({ role: 'student', id: student.regNumber }));
+            showStudentDashboard();
+            trackEvent('student_login', { regNumber: student.regNumber });
+        } else {
+            document.getElementById('studentError').textContent = 'Invalid registration number or password';
+            document.getElementById('studentError').style.display = 'block';
+        }
+    });
+    
+    // Teacher Dashboard
+    function showTeacherDashboard() {
+        document.getElementById('roleContainer').style.display = 'none';
+        document.getElementById('teacherDashboard').style.display = 'block';
+        
+        document.getElementById('teacherName').textContent = currentUser.fullName;
+        document.getElementById('teacherSubjectDisplay').textContent = currentUser.subject;
+        document.getElementById('teacherIdDisplay').textContent = currentUser.id;
+        
+        loadTeacherMarks();
+    }
+    
+    function loadTeacherMarks() {
+        const students = JSON.parse(localStorage.getItem(STUDENTS_KEY));
+        const marksData = JSON.parse(localStorage.getItem(MARKS_KEY));
+        const classFilter = document.getElementById('classFilter')?.value || '';
+        const term = document.getElementById('termFilter')?.value || 'Term 1';
+        
+        let filteredStudents = students;
+        if (classFilter) {
+            filteredStudents = students.filter(s => s.class === classFilter);
+        }
+        
+        document.getElementById('totalStudents').textContent = filteredStudents.length;
+        
+        const tbody = document.getElementById('marksTableBody');
+        let totalMarks = 0;
+        let countWithMarks = 0;
+        
+        tbody.innerHTML = filteredStudents.map(student => {
+            const studentMarks = marksData[student.regNumber] || {};
+            const subjectMark = studentMarks[currentUser.subject] || {};
+            const mark = subjectMark[term] || '';
+            const grade = calculateGrade(parseInt(mark));
+            
+            if (mark) {
+                totalMarks += parseInt(mark);
+                countWithMarks++;
+            }
+            
+            return `
+                <tr>
+                    <td>${student.fullName}</td>
+                    <td>${student.regNumber}</td>
+                    <td>${student.class}</td>
+                    <td class="mark-cell">
+                        <input type="number" class="marks-input" id="mark_${student.regNumber}" value="${mark}" min="0" max="100" step="1">
+                    </td>
+                    <td class="grade-cell">${grade}</td>
+                    <td class="status-cell">${mark ? (parseInt(mark) >= 50 ? '<span style="color: green;">Pass</span>' : '<span style="color: red;">Fail</span>') : '-'}</td>
+                    <td>
+                        <button class="save-btn" onclick="saveMark('${student.regNumber}', '${term}')">Save</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        const classAverage = countWithMarks > 0 ? Math.round(totalMarks / countWithMarks) : 0;
+        document.getElementById('classAverage').textContent = classAverage + '%';
+    }
+    
+    function saveMark(regNumber, term) {
+        const markInput = document.getElementById(`mark_${regNumber}`);
+        const mark = parseInt(markInput.value);
+        
+        if (isNaN(mark) || mark < 0 || mark > 100) {
+            alert('Please enter a valid mark between 0 and 100');
+            return;
+        }
+        
+        const marksData = JSON.parse(localStorage.getItem(MARKS_KEY));
+        
+        if (!marksData[regNumber]) {
+            marksData[regNumber] = {};
+        }
+        if (!marksData[regNumber][currentUser.subject]) {
+            marksData[regNumber][currentUser.subject] = {};
+        }
+        
+        marksData[regNumber][currentUser.subject][term] = mark;
+        localStorage.setItem(MARKS_KEY, JSON.stringify(marksData));
+        
+        // Update grade display
+        const row = markInput.closest('tr');
+        const gradeCell = row.querySelector('.grade-cell');
+        const statusCell = row.querySelector('.status-cell');
+        const grade = calculateGrade(mark);
+        gradeCell.textContent = grade;
+        statusCell.innerHTML = mark >= 50 ? '<span style="color: green;">Pass</span>' : '<span style="color: red;">Fail</span>';
+        
+        alert('Mark saved successfully!');
+        loadTeacherMarks();
+        trackEvent('mark_saved', { student: regNumber, subject: currentUser.subject, mark: mark });
+    }
+    
+    // Student Dashboard
+    function showStudentDashboard() {
+        document.getElementById('roleContainer').style.display = 'none';
+        document.getElementById('studentDashboard').style.display = 'block';
+        
+        document.getElementById('studentNameDisplay').textContent = currentUser.fullName;
+        document.getElementById('studentRegDisplay').textContent = currentUser.regNumber;
+        document.getElementById('studentClassDisplay').textContent = currentUser.class;
+        
+        loadStudentMarks();
+    }
+    
+    function loadStudentMarks() {
+        const term = document.getElementById('studentTermFilter')?.value || 'Term 1';
+        const marksData = JSON.parse(localStorage.getItem(MARKS_KEY));
+        const teachers = JSON.parse(localStorage.getItem(TEACHERS_KEY));
+        const studentMarks = marksData[currentUser.regNumber] || {};
+        
+        // Get all subjects from teachers
+        const allSubjects = [...new Set(teachers.map(t => t.subject))];
+        
+        let totalMarks = 0;
+        let subjectsWithMarks = 0;
+        let bestMark = 0;
+        let bestSubject = '-';
+        
+        const tbody = document.getElementById('studentMarksBody');
+        tbody.innerHTML = allSubjects.map(subject => {
+            const subjectMark = studentMarks[subject] || {};
+            const mark = subjectMark[term];
+            const grade = mark ? calculateGrade(parseInt(mark)) : '-';
+            const status = mark ? (parseInt(mark) >= 50 ? 'Pass' : 'Fail') : '-';
+            
+            if (mark) {
+                totalMarks += parseInt(mark);
+                subjectsWithMarks++;
+                if (parseInt(mark) > bestMark) {
+                    bestMark = parseInt(mark);
+                    bestSubject = subject;
+                }
+            }
+            
+            return `
+                <tr>
+                    <td>${subject}</td>
+                    <td class="${mark ? (parseInt(mark) >= 70 ? 'grade-A' : parseInt(mark) >= 50 ? 'grade-C' : 'grade-F') : ''}">${mark || '-'}%</td>
+                    <td>${grade}</td>
+                    <td>${status}</td>
+                    <td>${mark ? (parseInt(mark) >= 70 ? 'Excellent' : parseInt(mark) >= 50 ? 'Good' : 'Needs Improvement') : 'Not graded'}</td>
+                </tr>
+            `;
+        }).join('');
+        
+        const overallAverage = subjectsWithMarks > 0 ? Math.round(totalMarks / subjectsWithMarks) : 0;
+        const performanceGrade = calculateGrade(overallAverage);
+        
+        document.getElementById('overallAverage').textContent = overallAverage + '%';
+        document.getElementById('bestSubject').textContent = bestSubject !== '-' ? bestSubject : '-';
+        document.getElementById('performanceGrade').textContent = performanceGrade;
+    }
+    
+    function calculateGrade(score) {
+        if (score >= 80) return 'A (Distinction)';
+        if (score >= 70) return 'B (Very Good)';
+        if (score >= 60) return 'C (Good)';
+        if (score >= 50) return 'D (Satisfactory)';
+        if (score >= 40) return 'E (Pass)';
+        return 'F (Fail)';
+    }
+    
+    function logout(role) {
+        sessionStorage.removeItem('marks_logged_in');
+        currentUser = null;
+        
+        document.getElementById('roleContainer').style.display = 'block';
+        document.getElementById('teacherDashboard').style.display = 'none';
+        document.getElementById('studentDashboard').style.display = 'none';
+        
+        document.querySelectorAll('.form-container').forEach(form => form.classList.remove('active'));
+        if (role === 'teacher') {
+            document.getElementById('teacherForm').classList.add('active');
+        } else {
+            document.getElementById('studentForm').classList.add('active');
+        }
+        
+        trackEvent('logout', { role: role });
+    }
+    
+    // Check for existing session
+    const savedSession = sessionStorage.getItem('marks_logged_in');
+    if (savedSession) {
+        const session = JSON.parse(savedSession);
+        if (session.role === 'teacher') {
+            const teachers = JSON.parse(localStorage.getItem(TEACHERS_KEY));
+            currentUser = teachers.find(t => t.id === session.id);
+            if (currentUser) showTeacherDashboard();
+        } else if (session.role === 'student') {
+            const students = JSON.parse(localStorage.getItem(STUDENTS_KEY));
+            currentUser = students.find(s => s.regNumber === session.id);
+            if (currentUser) showStudentDashboard();
+        }
+    }
+</script>
+
+</body>
+</html>

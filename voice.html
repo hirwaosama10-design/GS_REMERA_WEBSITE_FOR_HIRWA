@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G.S Remera TSS - Visitor Activity Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{ font-family: Algerian, serif;background:rgb(69,53,53);min-height:100vh;display:flex;flex-direction:column;}
+body.dark-mode{background:#1a1a2e;}
+body.dark-mode .main-content{background:#16213e;color:#eee;}
+body.dark-mode .card,body.dark-mode .stats-card,body.dark-mode .table-container,body.dark-mode .modal-content,body.dark-mode .form-panel{background:#0f3460;color:#eee;}
+body.dark-mode table td{border-bottom-color:#1a1a2e;color:#ddd;}
+body.dark-mode th{background:#0a1628;}
+body.dark-mode input,body.dark-mode select,body.dark-mode textarea{background:#1a1a2e;border-color:#0f3460;color:white;}
+body.dark-mode footer{background:#0f3460;}
+header{background:rgb(5,203,238);font-family: Algerian, serif;color:white;padding:15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+header img{height:80px;object-fit:contain;}
+.header-controls{display:flex;align-items:center;gap:15px;}
+.dark-toggle{background:rgba(255,255,255,0.2);border:none;color:white;padding:8px 15px;border-radius:20px;cursor:pointer;font-size:14px;transition:0.3s;}
+.dark-toggle:hover{background:rgba(255,255,255,0.3);}
+.user-badge{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.2);padding:5px 15px;border-radius:30px;}
+.user-avatar{width:35px;height:35px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#0055aa;font-weight:bold;}
+@media(max-width:768px){header img{height:50px;}header div{font-size:16px!important;}.user-badge span{display:none;}}
+nav{display:flex;justify-content:center;background:#0055aa;position:sticky;top:0;z-index:100;flex-wrap:wrap;}
+nav a{padding:15px 20px;text-decoration:none;color:white;font-weight:bold;transition:0.3s;}
+nav a:hover{color:chartreuse;background:#003d80;}
+.admin-wrapper{display:flex;flex:1;min-height:calc(100vh - 280px);}
+.sidebar{width:280px;background:#0055aa;color:white;overflow-y:auto;}
+.sidebar-header{background:rgb(5,203,238);padding:20px;text-align:center;}
+.sidebar-header h3{font-size:18px;margin-bottom:5px;}
+.sidebar-header p{font-size:12px;opacity:0.9;}
+.sidebar-menu{padding:15px 0;}
+.menu-item{padding:12px 25px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.3s;border-left:3px solid transparent;}
+.menu-item:hover{background:rgba(255,255,255,0.1);padding-left:30px;}
+.menu-item.active{background:rgba(5,203,238,0.2);border-left-color:rgb(5,203,238);}
+.menu-item i{width:20px;}
+.main-content{flex:1;padding:25px;background:rgba(255,255,255,0.95);overflow-y:auto;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:30px;}
+.stats-card{background:white;border-radius:15px;padding:20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:transform 0.3s;}
+.stats-card:hover{transform:translateY(-3px);}
+.stats-info h3{font-size:12px;color:#666;margin-bottom:8px;}
+.stats-number{font-size:28px;font-weight:bold;color:#0055aa;}
+.stats-icon{width:50px;height:50px;background:linear-gradient(135deg,#0055aa,rgb(5,203,238));border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-size:24px;}
+.charts-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:25px;margin-bottom:30px;}
+.chart-card{background:white;border-radius:15px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.chart-card h3{margin-bottom:15px;color:#0055aa;}
+.table-container{background:white;border-radius:15px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);overflow-x:auto;margin-bottom:25px;}
+.table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:15px;}
+.btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.3s;}
+.btn-primary{background:#0055aa;color:white;}
+.btn-primary:hover{background:#003d80;}
+.btn-danger{background:#dc3545;color:white;}
+.btn-danger:hover{background:#c82333;}
+.btn-success{background:#28a745;color:white;}
+.btn-warning{background:#ffc107;color:#333;}
+.btn-info{background:#17a2b8;color:white;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;padding:12px;background:#0055aa;color:white;font-weight:600;}
+td{padding:12px;border-bottom:1px solid #e2e8f0;}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-success{background:#d4edda;color:#155724;}
+.badge-warning{background:#fff3cd;color:#856404;}
+.badge-danger{background:#f8d7da;color:#721c24;}
+.badge-info{background:#d1ecf1;color:#0c5460;}
+.activity-feed{max-height:400px;overflow-y:auto;}
+.activity-item{padding:12px;border-left:3px solid #0055aa;background:#f7fafc;margin-bottom:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.activity-type{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:bold;margin-right:8px;}
+.type-pageview{background:#28a745;color:white;}
+.type-click{background:#ffc107;color:#333;}
+.type-form{background:#17a2b8;color:white;}
+.type-scroll{background:#6f42c1;color:white;}
+.type-time{background:#fd7e14;color:white;}
+.type-message{background:#e83e8c;color:white;}
+.login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0055aa,rgb(5,203,238));}
+.login-box{background:white;padding:40px;border-radius:15px;width:100%;max-width:500px;box-shadow:0 10px 40px rgba(0,0,0,0.2);}
+.login-box h2{text-align:center;margin-bottom:20px;color:#0055aa;}
+.login-box input{width:100%;padding:12px;margin-bottom:15px;border:1px solid #ddd;border-radius:8px;}
+.login-btn{width:100%;padding:12px;background:#0055aa;color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:600;margin-bottom:15px;}
+.login-btn:hover{background:rgb(5,203,238);}
+.voice-btn{width:100%;padding:12px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:600;margin-bottom:15px;transition:0.3s;}
+.voice-btn:hover{background:#218838;}
+.voice-btn.listening{background:#dc3545;animation:pulse 1s infinite;}
+.voice-btn.mic-on{background:#17a2b8;}
+@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.02);}100%{transform:scale(1);}}
+.voice-status{text-align:center;margin:10px 0;padding:8px;border-radius:8px;font-size:13px;background:#f0f2f5;color:#333;}
+.voice-status.listening-active{background:#c8e6c9;color:#155724;}
+.voice-status.word-detected{background:#fff3cd;color:#856404;}
+.login-error{color:#dc3545;text-align:center;margin-top:15px;display:none;}
+.back-home-link{display:block;text-align:center;margin-top:20px;padding:10px;color:#0055aa;text-decoration:none;font-size:14px;border-top:1px solid #eee;transition:0.3s;}
+.back-home-link:hover{color:rgb(5,203,238);background:#f5f5f5;border-radius:8px;}
+.mic-icon{display:inline-block;width:12px;height:12px;border-radius:50%;background:#28a745;margin-right:8px;animation:blink 1s infinite;}
+@keyframes blink{0%{opacity:1;}50%{opacity:0.3;}100%{opacity:1;}}
+.speech-log{font-size:11px;color:#666;margin-top:5px;padding:5px;background:#f8f9fa;border-radius:5px;max-height:150px;overflow-y:auto;}
+.speech-item{padding:3px 0;border-bottom:1px solid #eee;}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center;}
+.modal-content{background:white;border-radius:15px;width:90%;max-width:600px;max-height:80vh;overflow-y:auto;}
+.modal-header{padding:20px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;background:#0055aa;color:white;border-radius:15px 15px 0 0;}
+.modal-body{padding:20px;}
+.modal-footer{padding:20px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:10px;}
+.close-modal{cursor:pointer;font-size:24px;color:white;}
+.reply-box{background:#f8f9fa;padding:15px;border-radius:10px;margin-top:20px;}
+.reply-box textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;font-family:inherit;}
+footer{background:rgb(5,203,238);color:white;padding:30px 20px;margin-top:auto;}
+.footer-content{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;max-width:1200px;margin:0 auto;}
+.footer-section{flex:1;min-width:180px;}
+.footer-section h3{margin-bottom:15px;font-size:16px;}
+.footer-section a{color:white;text-decoration:none;font-size:13px;line-height:1.8;}
+.social-icons{display:flex;gap:12px;margin-top:15px;flex-wrap:wrap;}
+.icon{display:inline-flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:50%;color:white;font-size:18px;transition:0.3s;}
+.fb{background:#1877f2;}.yt{background:#ff0000;}.tt{background:#000000;}.ig{background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4);}
+.icon:hover{transform:scale(1.1);}
+hr{margin:20px 0;border:1px solid rgba(255,255,255,0.2);}
+.copyright{text-align:center;font-size:12px;}
+.voice-log{background:#e8f5e9;border-left:4px solid #28a745;}
+.language-badge{background:#6c757d;color:white;padding:2px 6px;border-radius:10px;font-size:10px;margin-left:5px;}
+@media(max-width:768px){.admin-wrapper{flex-direction:column;}.sidebar{width:100%;}.stats-grid{grid-template-columns:1fr 1fr;}.charts-row{grid-template-columns:1fr;}.footer-content{flex-direction:column;text-align:center;}.social-icons{justify-content:center;}.activity-item{flex-direction:column;align-items:flex-start;}}
+</style>
+</head>
+<body>
+
+<div id="loginPage" class="login-page">
+    <div class="login-box">
+        <h2><i class="fa fa-chart-line"></i> Visitor Activity Dashboard</h2>
+        <div id="loginError" class="login-error"></div>
+        
+        <!-- Voice Login Status - Always Listening Globally -->
+        <div id="voiceStatus" class="voice-status listening-active">
+            <span class="mic-icon"></span> <strong>🌍 GLOBAL VOICE RECOGNITION ACTIVE!</strong><br>
+            Listening to ALL speech from any language. Just say "<strong style="color:#28a745;">admin</strong>" to login
+        </div>
+        
+        <!-- Voice Login Button (Toggle ON/OFF) -->
+        <button id="voiceLoginBtn" class="voice-btn mic-on">
+            <i class="fa fa-globe"></i> 🌐 Voice Recognition: <strong>ON</strong> (Listening worldwide)
+        </button>
+        
+        <!-- Live Speech Log -->
+        <div id="speechLog" class="speech-log">
+            <small><i class="fa fa-microphone"></i> Live speech detection log:</small>
+            <div id="speechLogContent"><em>Waiting for speech...</em></div>
+        </div>
+        
+        <div style="text-align:center; margin:10px 0; color:#718096;">— OR —</div>
+        
+        <form id="loginForm">
+            <input type="text" id="adminUsername" placeholder="Username" required>
+            <input type="password" id="adminPassword" placeholder="Password" required>
+            <button type="submit" class="login-btn"><i class="fa fa-sign-in-alt"></i> Access Dashboard</button>
+        </form>
+        
+        <a href="Home.html" class="back-home-link">
+            <i class="fa fa-home"></i> Back to Home
+        </a>
+        <div style="text-align:center;margin-top:15px;font-size:12px;color:#718096;">
+            🌍 Voice Command: Say "<strong style="color:#28a745;">admin</strong>" in ANY language - System listens to all speech!
+        </div>
+    </div>
+</div>
+
+<div id="dashboard" style="display:none;">
+    <header>
+        <a href="Home.html"><img src="2.png" alt="Logo" height="100"></a>
+        <div style="text-align: center; font-size: 28px; font-weight: bold;">WELCOME TO GS REMERA TSS</div>
+        <div class="header-controls">
+            <button class="dark-toggle" onclick="toggleDarkMode()"><i class="fa fa-moon"></i> Dark Mode</button>
+            <div class="user-badge"><div class="user-avatar" id="adminAvatar">A</div><span id="adminName">Admin</span></div>
+        </div>
+    </header>
+    <nav>
+        <a href="Home.html">Home</a><a href="department.html">Department</a> <a href="about.html">About</a><a href="stakeholder.html">Stakeholders</a>
+        <a href="log in2.html">Accounting</a><a href="login.html">Marks Portal</a><a href="event.html">Events</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+    <div class="admin-wrapper">
+        <div class="sidebar">
+            <div class="sidebar-header"><h3><i class="fa fa-chart-line"></i> ACTIVITY ANALYZER</h3><p>Real-time Visitor Tracking</p></div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-page="dashboard"><i class="fa fa-tachometer-alt"></i> Dashboard</div>
+                <div class="menu-item" data-page="live"><i class="fa fa-broadcast-tower"></i> Live Visitors</div>
+                <div class="menu-item" data-page="sessions"><i class="fa fa-users"></i> Visitor Sessions</div>
+                <div class="menu-item" data-page="pageviews"><i class="fa fa-eye"></i> Page Views</div>
+                <div class="menu-item" data-page="clicks"><i class="fa fa-mouse-pointer"></i> Click Tracking</div>
+                <div class="menu-item" data-page="forms"><i class="fa fa-file-alt"></i> Form Submissions</div>
+                <div class="menu-item" data-page="messages"><i class="fa fa-envelope"></i> Visitor Messages</div>
+                <div class="menu-item" data-page="scrolls"><i class="fa fa-arrow-down"></i> Scroll Depth</div>
+                <div class="menu-item" data-page="time"><i class="fa fa-clock"></i> Time on Site</div>
+                <div class="menu-item" data-page="analytics"><i class="fa fa-chart-line"></i> Analytics</div>
+                <div class="menu-item" data-page="settings"><i class="fa fa-cog"></i> Settings</div>
+                <div class="menu-item" onclick="logout()"><i class="fa fa-sign-out-alt"></i> Logout</div>
+            </div>
+        </div>
+        <div class="main-content" id="mainContent"><div style="text-align:center;padding:40px;"><i class="fa fa-spinner fa-spin" style="font-size:40px;color:#0055aa;"></i><p>Loading Visitor Activity...</p></div></div>
+    </div>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section"><a href="Home.html"><img src="2.png" alt="Logo" height="200"></a></div>
+            <div class="footer-section"><h3>Quick Links</h3><p><a href="Home.html">Home</a></p><p><a href="department.html">Department</a></p><p><a href="stakeholder.html">Stakeholders</a></p><p><a href="event.html">Events</a></p><p><a href="contact.html">Contact</a></p></div>
+            <div class="footer-section"><h3>Contact Us</h3><p><i class="fa fa-envelope"></i> busoro1972@gmail.com</p><p><i class="fa fa-phone"></i> +250782160168</p></div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/profile.php?id=61587210833693" class="icon fb"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.youtube.com/watch?v=YRhBfL3GEjQ" class="icon yt"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.tiktok.com/@osamathelegend4" class="icon tt"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.instagram.com/hirwaosama10/" class="icon ig"><i class="fab fa-instagram"></i></a>
+                </div>
+                <a href="admin.html" class="admin-footer-btn">
+                    <i class="fa fa-shield-alt"></i> Admin Dashboard
+                </a>
+            </div>
+            <div class="footer-section"><h3>Location</h3><iframe src="https://www.google.com/maps?q=G.S+REMERA+TSS+Rulindo+Cyinzuzi&output=embed" style="width:200px;height:150px;border:0;border-radius:8px;"></iframe></div>
+        </div>
+        <hr><div class="copyright"><p>Copyright © 2026 G.S Remera TSS | Visitor Activity Tracking System</p></div>
+    </footer>
+</div>
+
+<script>
+// Global Voice Login System - Listens to ALL speech from any language
+let recognition = null;
+let isListening = false;
+let voiceEnabled = true;
+let speechHistory = [];
+let lastDetectionTime = 0;
+
+// Supported languages for better global recognition
+const supportedLanguages = [
+    'en-US', 'en-GB', 'fr-FR', 'fr-CA', 'sw-KE', 'sw-TZ', 'rw-RW', 
+    'es-ES', 'de-DE', 'it-IT', 'pt-PT', 'zh-CN', 'ja-JP', 'ar-SA',
+    'hi-IN', 'ru-RU', 'ko-KR', 'nl-NL', 'pl-PL', 'tr-TR'
+];
+
+let currentLanguageIndex = 0;
+
+function addToSpeechLog(text, detectedLang = 'auto') {
+    const time = new Date().toLocaleTimeString();
+    speechHistory.unshift({ time, text, lang: detectedLang });
+    if (speechHistory.length > 20) speechHistory.pop();
+    
+    const logContent = document.getElementById('speechLogContent');
+    if (logContent) {
+        logContent.innerHTML = speechHistory.slice(0, 10).map(s => 
+            `<div class="speech-item"><small>[${s.time}]</small> <strong>🎤 "${s.text}"</strong> ${s.lang !== 'auto' ? `<span class="language-badge">${s.lang}</span>` : ''}</div>`
+        ).join('');
+        if (speechHistory.length === 0) logContent.innerHTML = '<em>Waiting for speech...</em>';
+    }
+}
+
+function detectLanguage(transcript) {
+    // Common words in different languages that might sound like "admin"
+    const adminVariants = [
+        'admin', 'админ', '管理员', 'administrateur', 'administrador', 
+        'amministratore', 'administrator', '管理人', '관리자', 'مدير',
+        'अडमिन', 'адміністратор', 'administrátor'
+    ];
+    
+    for (let variant of adminVariants) {
+        if (transcript.toLowerCase().includes(variant.toLowerCase())) {
+            return true;
+        }
+    }
+    return transcript.toLowerCase().includes('admin');
+}
+
+// Initialize Speech Recognition with auto language switching
+function initVoiceRecognition() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        console.warn('Speech recognition not supported');
+        document.getElementById('voiceStatus').innerHTML = '<i class="fa fa-exclamation-triangle"></i> Voice login not supported in this browser. Use Chrome, Edge, or Safari.';
+        return false;
+    }
+    
+    startNewRecognition();
+    return true;
+}
+
+function startNewRecognition() {
+    if (!voiceEnabled) return;
+    
+    try {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;  // Keep listening continuously
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 5;  // Get multiple interpretations
+        
+        // Cycle through languages for better global detection
+        recognition.lang = supportedLanguages[currentLanguageIndex % supportedLanguages.length];
+        
+        setupRecognitionHandlers();
+        recognition.start();
+        isListening = true;
+        
+        // Update UI with current language
+        const voiceStatus = document.getElementById('voiceStatus');
+        if (voiceStatus) {
+            voiceStatus.innerHTML = `<span class="mic-icon"></span> 🌍 GLOBAL VOICE RECOGNITION ACTIVE!<br>
+            Listening in: <strong>${recognition.lang}</strong> | Say "<strong style="color:#28a745;">admin</strong>" in ANY language`;
+        }
+        
+    } catch(e) {
+        console.log('Recognition error:', e);
+        setTimeout(() => {
+            if (voiceEnabled) startNewRecognition();
+        }, 1000);
+    }
+}
+
+function setupRecognitionHandlers() {
+    if (!recognition) return;
+    
+    recognition.onresult = function(event) {
+        const now = Date.now();
+        
+        // Process all results
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const result = event.results[i];
+            const isFinal = result.isFinal;
+            
+            // Check all alternatives
+            for (let j = 0; j < result.length; j++) {
+                const transcript = result[j].transcript.toLowerCase().trim();
+                const confidence = result[j].confidence;
+                
+                if (transcript.length > 0) {
+                    addToSpeechLog(transcript, recognition.lang);
+                    
+                    console.log(`🌍 Speech detected [${recognition.lang}]: "${transcript}" (confidence: ${confidence})`);
+                    
+                    // Check if spoken word contains "admin" or variants
+                    const isAdmin = detectLanguage(transcript);
+                    
+                    if (isAdmin && (now - lastDetectionTime) > 3000) { // 3 second cooldown
+                        lastDetectionTime = now;
+                        
+                        const voiceStatus = document.getElementById('voiceStatus');
+                        if (voiceStatus) {
+                            voiceStatus.innerHTML = `<i class="fa fa-check-circle"></i> ✅ "admin" detected in ${recognition.lang}! Logging in...`;
+                            voiceStatus.className = 'voice-status';
+                            voiceStatus.style.background = '#d4edda';
+                        }
+                        
+                        performVoiceLogin(transcript, recognition.lang);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Update UI to show we're still listening
+        const voiceStatus = document.getElementById('voiceStatus');
+        if (voiceStatus && !voiceStatus.innerHTML.includes('Listening')) {
+            setTimeout(() => {
+                if (voiceEnabled && voiceStatus) {
+                    voiceStatus.innerHTML = `<span class="mic-icon"></span> 🌍 GLOBAL VOICE RECOGNITION ACTIVE!<br>
+                    Listening in: <strong>${recognition.lang}</strong> | Say "<strong style="color:#28a745;">admin</strong>" in ANY language`;
+                    voiceStatus.className = 'voice-status listening-active';
+                }
+            }, 2000);
+        }
+    };
+    
+    recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'not-allowed') {
+            updateVoiceUI(false, '', '🔴 Microphone access denied. Please allow microphone and refresh.');
+            voiceEnabled = false;
+        } else if (event.error === 'no-speech') {
+            // Normal - just continue
+        } else if (event.error === 'language-not-supported') {
+            // Try next language
+            currentLanguageIndex++;
+            if (voiceEnabled) {
+                setTimeout(() => {
+                    if (voiceEnabled) startNewRecognition();
+                }, 500);
+            }
+        }
+    };
+    
+    recognition.onend = function() {
+        if (voiceEnabled) {
+            // Rotate to next language for better global coverage
+            currentLanguageIndex++;
+            setTimeout(() => {
+                if (voiceEnabled) startNewRecognition();
+            }, 500);
+        } else {
+            isListening = false;
+        }
+    };
+}
+
+function updateVoiceUI(isActive, statusClass, message) {
+    const voiceStatus = document.getElementById('voiceStatus');
+    const voiceBtn = document.getElementById('voiceLoginBtn');
+    
+    if (voiceStatus && message) {
+        voiceStatus.className = 'voice-status ' + statusClass;
+        voiceStatus.innerHTML = message;
+    }
+    
+    if (voiceBtn) {
+        if (isActive) {
+            voiceBtn.className = 'voice-btn mic-on';
+            voiceBtn.innerHTML = '<i class="fa fa-globe"></i> 🌐 Voice Recognition: <strong>ON</strong> (Listening worldwide)';
+        } else {
+            voiceBtn.className = 'voice-btn';
+            voiceBtn.innerHTML = '<i class="fa fa-microphone-slash"></i> 🌐 Voice Recognition: <strong>OFF</strong> - Click to Enable';
+        }
+    }
+}
+
+function stopContinuousListening() {
+    if (recognition && isListening) {
+        try {
+            recognition.stop();
+        } catch(e) {}
+        isListening = false;
+    }
+}
+
+function toggleVoiceRecognition() {
+    voiceEnabled = !voiceEnabled;
+    
+    if (voiceEnabled) {
+        startNewRecognition();
+        updateVoiceUI(true, 'listening-active', '<span class="mic-icon"></span> 🌍 GLOBAL VOICE RECOGNITION ACTIVE!<br>Listening to ALL speech from any language. Say "<strong style="color:#28a745;">admin</strong>" to login');
+    } else {
+        stopContinuousListening();
+        updateVoiceUI(false, '', '🔇 Voice recognition is OFF. Click to enable global listening.');
+    }
+}
+
+let ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' };
+let currentUser = { name: 'Admin User', role: 'Administrator', avatar: 'A' };
+const savedCreds = localStorage.getItem('admin_creds');
+if(savedCreds) ADMIN_CREDENTIALS = JSON.parse(savedCreds);
+
+function performVoiceLogin(detectedText, language) {
+    // Automatic login with voice command
+    sessionStorage.setItem('admin_logged', 'true');
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadPage('dashboard');
+    trackAdminActivity('voice_login', { method: 'global_voice', phrase: detectedText, language: language });
+    
+    // Add voice login record to activity log
+    const voiceLog = {
+        type: 'voice_login',
+        details: { message: `Admin logged in via global voice recognition - Said "${detectedText}" in ${language}` },
+        timestamp: new Date().toISOString()
+    };
+    const activityData = getActivityData();
+    activityData.events.unshift(voiceLog);
+    if(activityData.events.length > 500) activityData.events.pop();
+    saveActivityData(activityData);
+    
+    alert(`✅ Voice login successful! (Detected: "${detectedText}" in ${language})\nWelcome back, Admin.`);
+}
+
+// Manual Login Form
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('adminUsername').value;
+    const password = document.getElementById('adminPassword').value;
+    if(username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+        sessionStorage.setItem('admin_logged', 'true');
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        loadPage('dashboard');
+        trackAdminActivity('manual_login');
+    } else {
+        document.getElementById('loginError').textContent = 'Invalid credentials';
+        document.getElementById('loginError').style.display = 'block';
+        setTimeout(() => { document.getElementById('loginError').style.display = 'none'; }, 3000);
+    }
+});
+
+// Voice button event listener (Toggle)
+const voiceBtn = document.getElementById('voiceLoginBtn');
+if (voiceBtn) voiceBtn.addEventListener('click', toggleVoiceRecognition);
+
+// Initialize voice recognition on page load
+initVoiceRecognition();
+
+function getActivityData() { return JSON.parse(localStorage.getItem('website_activity_data') || '{"sessions":{},"events":[],"pageStats":{},"startTime":"' + new Date().toISOString() + '"}'); }
+function saveActivityData(data) { localStorage.setItem('website_activity_data', JSON.stringify(data)); }
+function getMessages() { return JSON.parse(localStorage.getItem('ticket_system_messages') || '[]'); }
+function saveMessages(m) { localStorage.setItem('ticket_system_messages', JSON.stringify(m)); }
+function trackAdminActivity(action, details = {}) {
+    const activities = JSON.parse(localStorage.getItem('admin_activity') || '[]');
+    activities.unshift({ id: Date.now(), action: action, details: details, user: currentUser.name, timestamp: new Date().toISOString() });
+    if(activities.length > 200) activities.pop();
+    localStorage.setItem('admin_activity', JSON.stringify(activities));
+}
+function loadPage(page) {
+    document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+        item.classList.remove('active');
+        if(item.dataset.page === page) item.classList.add('active');
+    });
+    if(page === 'dashboard') loadDashboard();
+    else if(page === 'live') loadLiveVisitors();
+    else if(page === 'sessions') loadVisitorSessions();
+    else if(page === 'pageviews') loadPageViews();
+    else if(page === 'clicks') loadClickTracking();
+    else if(page === 'forms') loadFormSubmissions();
+    else if(page === 'messages') loadVisitorMessages();
+    else if(page === 'scrolls') loadScrollDepth();
+    else if(page === 'time') loadTimeOnSite();
+    else if(page === 'analytics') loadAnalytics();
+    else if(page === 'settings') loadSettings();
+    trackAdminActivity('view_page', { page: page });
+}
+
+function loadDashboard() {
+    const data = getActivityData();
+    const sessions = Object.values(data.sessions || {});
+    const events = data.events || [];
+    const messages = getMessages();
+    const totalVisitors = sessions.length;
+    const totalPageViews = sessions.reduce((sum, s) => sum + (s.pageViews || 0), 0);
+    const totalClicks = sessions.reduce((sum, s) => sum + (s.clicks || 0), 0);
+    const totalForms = sessions.reduce((sum, s) => sum + (s.formSubmissions || 0), 0);
+    const activeNow = sessions.filter(s => { const lastActive = new Date(s.lastActivity); const now = new Date(); return (now - lastActive) < 30 * 60 * 1000; }).length;
+    const recentEvents = events.slice(0, 15);
+    document.getElementById('mainContent').innerHTML = `
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Total Visitors</h3><div class="stats-number">${totalVisitors}</div></div><div class="stats-icon"><i class="fa fa-users"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Active Now</h3><div class="stats-number">${activeNow}</div></div><div class="stats-icon"><i class="fa fa-broadcast-tower"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Page Views</h3><div class="stats-number">${totalPageViews}</div></div><div class="stats-icon"><i class="fa fa-eye"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Clicks</h3><div class="stats-number">${totalClicks}</div></div><div class="stats-icon"><i class="fa fa-mouse-pointer"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Form Submissions</h3><div class="stats-number">${totalForms}</div></div><div class="stats-icon"><i class="fa fa-file-alt"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Messages</h3><div class="stats-number">${messages.length}</div></div><div class="stats-icon"><i class="fa fa-envelope"></i></div></div>
+        </div>
+        <div class="charts-row"><div class="chart-card"><h3><i class="fa fa-chart-line"></i> Page Views (Last 7 Days)</h3><canvas id="trafficChart"></canvas></div><div class="chart-card"><h3><i class="fa fa-chart-pie"></i> Activity Distribution</h3><canvas id="activityChart"></canvas></div></div>
+        <div class="table-container"><div class="table-header"><h3><i class="fa fa-clock"></i> Recent Visitor Activity</h3><button class="btn btn-danger" onclick="clearAllActivity()">Clear All Activity</button></div>
+        <div class="activity-feed">${recentEvents.map(e => `<div class="activity-item ${e.type === 'voice_login' ? 'voice-log' : ''}"><div><span class="activity-type type-${e.type === 'voice_login' ? 'message' : e.type}">${e.type === 'voice_login' ? '🔊 VOICE LOGIN' : e.type.toUpperCase()}</span><strong>${e.details?.page || e.details?.element || e.details?.formId || e.details?.message || (e.type === 'voice_login' ? e.details?.message || 'Admin logged in via global voice' : 'Activity')}</strong>${e.details?.text ? `<small> - "${e.details.text.substring(0, 50)}"</small>` : ''}</div><div><small><i class="fa fa-calendar"></i> ${formatDate(e.timestamp)}</small></div></div>`).join('')}${recentEvents.length===0?'<div style="text-align:center;padding:30px;">No visitor activity recorded yet.</div>':''}</div></div>`;
+    const ctx1 = document.getElementById('trafficChart')?.getContext('2d');
+    if(ctx1) new Chart(ctx1, { type: 'line', data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets: [{ label: 'Page Views', data: [45,60,75,90,110,130,120], borderColor: '#0055aa', tension: 0.4, fill: true, backgroundColor: 'rgba(0,85,170,0.1)' }] } });
+    const ctx2 = document.getElementById('activityChart')?.getContext('2d');
+    if(ctx2) { const typeCounts = { pageview:0, click:0, form:0, scroll:0, time_on_page:0, voice_login:0 }; events.forEach(e => { if(typeCounts[e.type] !== undefined) typeCounts[e.type]++; }); new Chart(ctx2, { type: 'doughnut', data: { labels: ['Page Views','Clicks','Forms','Scrolls','Time Events','Voice Logins'], datasets: [{ data: [typeCounts.pageview,typeCounts.click,typeCounts.form,typeCounts.scroll,typeCounts.time_on_page,typeCounts.voice_login], backgroundColor: ['#0055aa','rgb(5,203,238)','#28a745','#ffc107','#fd7e14','#dc3545'] }] } }); }
+}
+
+function loadLiveVisitors() {
+    const data = getActivityData();
+    const sessions = Object.values(data.sessions || {});
+    const activeNow = sessions.filter(s => { const lastActive = new Date(s.lastActivity); const now = new Date(); return (now - lastActive) < 30 * 60 * 1000; });
+    document.getElementById('mainContent').innerHTML = `
+        <div style="margin-bottom:20px;"><h2 style="color:#0055aa;"><i class="fa fa-broadcast-tower"></i> Live Visitors</h2><p>Users currently browsing your website (last 30 minutes)</p></div>
+        <div class="stats-grid"><div class="stats-card"><div class="stats-info"><h3>Active Visitors</h3><div class="stats-number">${activeNow.length}</div></div><div class="stats-icon"><i class="fa fa-broadcast-tower"></i></div></div></div>
+        <div class="table-container"><div class="table-header"><h3>Active Sessions</h3><button class="btn btn-success" onclick="loadLiveVisitors()"><i class="fa fa-refresh"></i> Refresh</button></div>
+        <table><thead><tr><th>Session ID</th><th>Start Time</th><th>Last Activity</th><th>Page Views</th><th>Clicks</th><th>Device Info</th></tr></thead><tbody>${activeNow.map(s => `<tr><td><code>${s.id?.substring(0,16)}...</code></td><td>${formatDate(s.startTime)}</td><td>${formatDate(s.lastActivity)}</td><td>${s.pageViews || 0}</td><td>${s.clicks || 0}</td><td><small>${s.userAgent?.substring(0,50)}...</small></td></tr>`).join('')}${activeNow.length===0?'<tr><td colspan="6" style="text-align:center">No active visitors currently</td>':''}</tbody>}</div>`;
+    setTimeout(() => { if(document.querySelector('.menu-item.active')?.dataset.page === 'live') loadLiveVisitors(); }, 10000);
+}
+
+function loadVisitorSessions() {
+    const data = getActivityData();
+    const sessions = Object.values(data.sessions || {}).sort((a,b) => new Date(b.startTime) - new Date(a.startTime));
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-users"></i> All Visitor Sessions</h2>
+        <div class="table-container"><div class="table-header"><h3>Session History</h3><button class="btn btn-danger" onclick="deleteAllSessions()">Delete All Sessions</button></div>
+        <table><thead><tr><th>Session ID</th><th>Start Time</th><th>Last Activity</th><th>Duration</th><th>Page Views</th><th>Clicks</th><th>Device</th><th>Actions</th></tr></thead><tbody>${sessions.map(s => `<tr><td><code>${s.id?.substring(0,16)}...</code></td><td>${formatDate(s.startTime)}</td><td>${formatDate(s.lastActivity)}</td><td>${calculateDuration(s.startTime, s.lastActivity)}</td><td>${s.pageViews || 0}</td><td>${s.clicks || 0}</td><td><small>${s.userAgent?.substring(0,40)}...</small></td><td><button class="btn btn-danger" onclick="deleteSession('${s.id}')" style="padding:3px 8px;"><i class="fa fa-trash"></i></button></td></tr>`).join('')}${sessions.length===0?'<tr><td colspan="8" style="text-align:center">No visitor sessions recorded</td></tr>':''}</tbody>}</div>`;
+}
+
+function loadPageViews() {
+    const data = getActivityData();
+    const pageViews = data.events.filter(e => e.type === 'pageview');
+    const pageStats = {};
+    pageViews.forEach(pv => { const page = pv.details?.page || 'Unknown'; pageStats[page] = (pageStats[page] || 0) + 1; });
+    const sortedPages = Object.entries(pageStats).sort((a,b) => b[1] - a[1]);
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-eye"></i> Page Views Analytics</h2>
+        <div class="stats-grid"><div class="stats-card"><div class="stats-info"><h3>Total Page Views</h3><div class="stats-number">${pageViews.length}</div></div><div class="stats-icon"><i class="fa fa-eye"></i></div></div><div class="stats-card"><div class="stats-info"><h3>Unique Pages</h3><div class="stats-number">${Object.keys(pageStats).length}</div></div><div class="stats-icon"><i class="fa fa-file"></i></div></div></div>
+        <div class="table-container"><div class="table-header"><h3>Most Visited Pages</h3><button class="btn btn-danger" onclick="clearPageViews()">Clear Page Views</button></div>
+        <table><thead><tr><th>Page URL</th><th>Views</th><th>Percentage</th><th>Actions</th></tr></thead><tbody>${sortedPages.slice(0,20).map(([page,count]) => `<tr><td>${escapeHtml(page)}</td><td>${count}</td><td>${Math.round(count/pageViews.length*100)}%</td><td><button class="btn btn-danger" onclick="clearPageView('${page}')" style="padding:3px 8px;">Clear</button></td></tr>`).join('')}${sortedPages.length===0?'<tr><td colspan="4" style="text-align:center">No page views recorded</td></tr>':''}</tbody>}</div>`;
+}
+
+function loadClickTracking() {
+    const data = getActivityData();
+    const clicks = data.events.filter(e => e.type === 'click');
+    const clickStats = {};
+    clicks.forEach(c => { const element = c.details?.element || 'Unknown'; clickStats[element] = (clickStats[element] || 0) + 1; });
+    const sortedClicks = Object.entries(clickStats).sort((a,b) => b[1] - a[1]);
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-mouse-pointer"></i> Click Tracking</h2>
+        <div class="stats-grid"><div class="stats-card"><div class="stats-info"><h3>Total Clicks</h3><div class="stats-number">${clicks.length}</div></div><div class="stats-icon"><i class="fa fa-mouse-pointer"></i></div></div><div class="stats-card"><div class="stats-info"><h3>Unique Elements</h3><div class="stats-number">${Object.keys(clickStats).length}</div></div><div class="stats-icon"><i class="fa fa-list"></i></div></div></div>
+        <div class="table-container"><div class="table-header"><h3>Most Clicked Elements</h3><button class="btn btn-danger" onclick="clearClicks()">Clear Clicks</button></div>
+        </table><thead><tr><th>Element Type</th><th>Clicks</th><th>Percentage</th><th>Actions</th></tr></thead><tbody>${sortedClicks.slice(0,15).map(([element,count]) => `<tr><td>${escapeHtml(element)}</td><td>${count}</td><td>${Math.round(count/clicks.length*100)}%</td><td><button class="btn btn-danger" onclick="clearClickElement('${element}')" style="padding:3px 8px;">Clear</button></td></tr>`).join('')}${sortedClicks.length===0?'<tr><td colspan="4" style="text-align:center">No clicks recorded</td></tr>':''}</tbody>}</div>`;
+}
+
+function loadFormSubmissions() {
+    const data = getActivityData();
+    const forms = data.events.filter(e => e.type === 'form');
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-file-alt"></i> Form Submissions</h2>
+        <div class="stats-grid"><div class="stats-card"><div class="stats-info"><h3>Total Submissions</h3><div class="stats-number">${forms.length}</div></div><div class="stats-icon"><i class="fa fa-file-alt"></i></div></div></div>
+        <div class="table-container"><div class="table-header"><h3>Form Submission History</h3><button class="btn btn-danger" onclick="clearForms()">Clear Forms</button></div>
+        <table><thead><tr><th>Form ID</th><th>Data</th><th>Page</th><th>Time</th><th>Actions</th></tr></thead><tbody>${forms.map(f => `<tr><td>${escapeHtml(f.details?.formId || 'Unknown')}</td><td><pre style="max-width:200px;overflow-x:auto;font-size:11px;">${JSON.stringify(f.details?.data || {}, null, 2)}</pre></td><td>${escapeHtml(f.details?.page || 'Unknown')}</td><td>${formatDate(f.timestamp)}</td><td><button class="btn btn-danger" onclick="deleteFormEntry('${f.timestamp}')" style="padding:3px 8px;">Delete</button></td></tr>`).join('')}${forms.length===0?'<tr><td colspan="5" style="text-align:center">No form submissions recorded</td></tr>':''}</tbody>}</div>`;
+}
+
+let currentMessageIndex = null;
+
+function loadVisitorMessages() {
+    const messages = getMessages();
+    const unreadCount = messages.filter(m => !m.isRead).length;
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-envelope"></i> Visitor Messages</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Total Messages</h3><div class="stats-number">${messages.length}</div></div><div class="stats-icon"><i class="fa fa-envelope"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Unread</h3><div class="stats-number">${unreadCount}</div></div><div class="stats-icon"><i class="fa fa-envelope-open"></i></div></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3>All Contact Messages</h3><button class="btn btn-danger" onclick="deleteAllMessages()">Delete All</button></div>
+        <table><thead><tr><th>Status</th><th>From</th><th>Email</th><th>Subject</th><th>Priority</th><th>Date</th><th>Actions</th></tr></thead><tbody>
+            ${messages.map((m, idx) => `<tr>
+                <td>${!m.isRead ? '<span class="badge badge-warning">Unread</span>' : '<span class="badge badge-success">Read</span>'}</td>
+                <td><strong>${escapeHtml(m.name)}</strong></td>
+                <td>${escapeHtml(m.email)}</td>
+                <td>${escapeHtml(m.subject)}</td>
+                <td><span class="badge ${m.priority === 'high' ? 'badge-danger' : m.priority === 'medium' ? 'badge-warning' : 'badge-success'}">${m.priority || 'low'}</span></td>
+                <td>${formatDate(m.timestamp)}</td>
+                <td class="action-buttons"><button class="btn btn-info" onclick="viewMessageDetail(${idx})"><i class="fa fa-eye"></i> View</button> <button class="btn btn-danger" onclick="deleteMessage(${idx})"><i class="fa fa-trash"></i></button></td>
+            </tr>`).join('')}
+            ${messages.length === 0 ? '<tr><td colspan="7" style="text-align:center">No messages from visitors yet</td></tr>' : ''}
+        </tbody>}</div>`;
+}
+
+function viewMessageDetail(index) {
+    const messages = getMessages();
+    const msg = messages[index];
+    if(!msg) return;
+    currentMessageIndex = index;
+    if(!msg.isRead) {
+        msg.isRead = true;
+        saveMessages(messages);
+        loadVisitorMessages();
+    }
+    document.body.insertAdjacentHTML('beforeend', `
+        <div id="messageModal" class="modal" style="display:flex;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fa fa-envelope"></i> Message from ${escapeHtml(msg.name)}</h3>
+                    <span class="close-modal" onclick="closeMessageModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom:15px;">
+                        <p><strong><i class="fa fa-user"></i> Name:</strong> ${escapeHtml(msg.name)}</p>
+                        <p><strong><i class="fa fa-envelope"></i> Email:</strong> ${escapeHtml(msg.email)}</p>
+                        <p><strong><i class="fa fa-phone"></i> Phone:</strong> ${escapeHtml(msg.phone || 'Not provided')}</p>
+                        <p><strong><i class="fa fa-tag"></i> Subject:</strong> ${escapeHtml(msg.subject)}</p>
+                        <p><strong><i class="fa fa-flag"></i> Priority:</strong> <span class="badge ${msg.priority === 'high' ? 'badge-danger' : msg.priority === 'medium' ? 'badge-warning' : 'badge-success'}">${msg.priority || 'low'}</span></p>
+                        <p><strong><i class="fa fa-calendar"></i> Sent:</strong> ${formatDate(msg.timestamp)}</p>
+                    </div>
+                    <div style="background:#f8f9fa;padding:15px;border-radius:10px;margin-bottom:15px;">
+                        <strong><i class="fa fa-comment"></i> Message:</strong>
+                        <p style="margin-top:10px;line-height:1.6;">${escapeHtml(msg.message)}</p>
+                    </div>
+                    <div class="reply-box">
+                        <strong><i class="fa fa-reply"></i> Reply to ${escapeHtml(msg.name)}:</strong>
+                        <textarea id="replyMessage" rows="4" placeholder="Type your reply here...">${msg.reply || ''}</textarea>
+                        <button class="btn btn-primary" onclick="sendMessageReply()"><i class="fa fa-paper-plane"></i> Send Reply</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" onclick="deleteMessage(${index})">Delete Message</button>
+                    <button class="btn btn-primary" onclick="closeMessageModal()">Close</button>
+                </div>
+            </div>
+        </div>
+        <div id="modalOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:999;"></div>
+    `);
+}
+
+function closeMessageModal() {
+    document.getElementById('messageModal')?.remove();
+    document.getElementById('modalOverlay')?.remove();
+    loadVisitorMessages();
+}
+
+function sendMessageReply() {
+    const reply = document.getElementById('replyMessage')?.value;
+    if(!reply) { alert('Please enter a reply message'); return; }
+    const messages = getMessages();
+    if(currentMessageIndex !== null && messages[currentMessageIndex]) {
+        messages[currentMessageIndex].reply = reply;
+        messages[currentMessageIndex].replyDate = new Date().toISOString();
+        saveMessages(messages);
+        alert('Reply sent successfully!');
+        closeMessageModal();
+        trackAdminActivity('message_replied', { to: messages[currentMessageIndex].email });
+    }
+}
+
+function deleteMessage(index) {
+    if(confirm('Delete this message?')) {
+        let messages = getMessages();
+        messages.splice(index, 1);
+        saveMessages(messages);
+        closeMessageModal();
+        loadVisitorMessages();
+        trackAdminActivity('message_deleted');
+    }
+}
+
+function deleteAllMessages() {
+    if(confirm('Delete ALL messages? This cannot be undone.')) {
+        saveMessages([]);
+        loadVisitorMessages();
+        trackAdminActivity('all_messages_deleted');
+    }
+}
+
+function loadScrollDepth() {
+    const data = getActivityData();
+    const scrolls = data.events.filter(e => e.type === 'scroll');
+    const depthStats = { 25: 0, 50: 0, 75: 0, 100: 0 };
+    scrolls.forEach(s => { const percent = s.details?.percent; if(percent) depthStats[percent] = (depthStats[percent] || 0) + 1; });
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-arrow-down"></i> Scroll Depth Tracking</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>25% Scroll</h3><div class="stats-number">${depthStats[25]}</div></div><div class="stats-icon"><i class="fa fa-arrow-down"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>50% Scroll</h3><div class="stats-number">${depthStats[50]}</div></div><div class="stats-icon"><i class="fa fa-arrow-down"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>75% Scroll</h3><div class="stats-number">${depthStats[75]}</div></div><div class="stats-icon"><i class="fa fa-arrow-down"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>100% Scroll</h3><div class="stats-number">${depthStats[100]}</div></div><div class="stats-icon"><i class="fa fa-flag-checkered"></i></div></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3>Scroll Events History</h3><button class="btn btn-danger" onclick="clearScrolls()">Clear Scroll Data</button></div>
+        <div class="activity-feed">${scrolls.slice(0,30).map(s => `<div class="activity-item"><span><i class="fa fa-arrow-down"></i> User scrolled to ${s.details?.percent}% on ${s.details?.page || 'Unknown page'}</span><span>${formatDate(s.timestamp)}</span></div>`).join('')}${scrolls.length===0?'<div style="text-align:center;padding:30px;">No scroll events recorded</div>':''}</div></div>`;
+}
+
+function loadTimeOnSite() {
+    const data = getActivityData();
+    const timeEvents = data.events.filter(e => e.type === 'time_on_page');
+    let totalTime = 0;
+    timeEvents.forEach(t => { totalTime += t.details?.seconds || 0; });
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-clock"></i> Time on Site Analytics</h2>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-info"><h3>Total Time Spent</h3><div class="stats-number">${Math.floor(totalTime/3600)}h ${Math.floor((totalTime%3600)/60)}m</div></div><div class="stats-icon"><i class="fa fa-clock"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Avg Time per Visit</h3><div class="stats-number">${timeEvents.length ? `${Math.floor(totalTime/timeEvents.length/60)}m ${Math.floor((totalTime/timeEvents.length)%60)}s` : '0m 0s'}</div></div><div class="stats-icon"><i class="fa fa-chart-line"></i></div></div>
+            <div class="stats-card"><div class="stats-info"><h3>Heartbeat Events</h3><div class="stats-number">${timeEvents.length}</div></div><div class="stats-icon"><i class="fa fa-heartbeat"></i></div></div>
+        </div>
+        <div class="table-container"><div class="table-header"><h3>Time Tracking Events</h3><button class="btn btn-danger" onclick="clearTimeEvents()">Clear Time Data</button></div>
+        <div class="activity-feed">${timeEvents.slice(0,30).map(t => `<div class="activity-item"><span><i class="fa fa-clock"></i> User spent ${Math.floor(t.details?.seconds/60)}m ${t.details?.seconds%60}s on ${t.details?.url || 'page'}</span><span>${formatDate(t.timestamp)}</span></div>`).join('')}${timeEvents.length===0?'<div style="text-align:center;padding:30px;">No time tracking events recorded</div>':''}</div></div>`;
+}
+
+function loadAnalytics() {
+    const data = getActivityData();
+    const sessions = Object.values(data.sessions || {});
+    const devices = {};
+    sessions.forEach(s => { const ua = s.userAgent || ''; if(ua.includes('Mobile')) devices.Mobile = (devices.Mobile || 0) + 1; else if(ua.includes('Tablet')) devices.Tablet = (devices.Tablet || 0) + 1; else devices.Desktop = (devices.Desktop || 0) + 1; });
+    const hourlyActivity = {};
+    data.events.forEach(e => { const hour = new Date(e.timestamp).getHours(); hourlyActivity[hour] = (hourlyActivity[hour] || 0) + 1; });
+    const browserStats = {};
+    sessions.forEach(s => { let browser = 'Unknown'; const ua = s.userAgent || ''; if(ua.includes('Chrome')) browser = 'Chrome'; else if(ua.includes('Firefox')) browser = 'Firefox'; else if(ua.includes('Safari')) browser = 'Safari'; else if(ua.includes('Edge')) browser = 'Edge'; browserStats[browser] = (browserStats[browser] || 0) + 1; });
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-chart-line"></i> Advanced Analytics</h2>
+        <div class="charts-row"><div class="chart-card"><h3>Device Distribution</h3><canvas id="deviceChart"></canvas></div><div class="chart-card"><h3>Hourly Activity</h3><canvas id="hourlyChart"></canvas></div></div>
+        <div class="table-container"><div class="table-header"><h3>Browser Statistics</h3></div><table><thead><tr><th>Browser</th><th>Count</th><th>Percentage</th></tr></thead><tbody>${Object.entries(browserStats).map(([browser,count]) => `<tr><td>${browser}</td><td>${count}</td><td>${Math.round(count/sessions.length*100)}%</td></tr>`).join('')}${Object.keys(browserStats).length===0?'<tr><td colspan="3">No data available</td></tr>':''}</tbody>}</div>`;
+    const ctx1 = document.getElementById('deviceChart')?.getContext('2d');
+    if(ctx1) new Chart(ctx1, { type: 'pie', data: { labels: Object.keys(devices), datasets: [{ data: Object.values(devices), backgroundColor: ['#0055aa','rgb(5,203,238)','#28a745'] }] } });
+    const ctx2 = document.getElementById('hourlyChart')?.getContext('2d');
+    if(ctx2) new Chart(ctx2, { type: 'line', data: { labels: Array.from({length:24}, (_,i) => i+':00'), datasets: [{ label: 'Activity', data: Array.from({length:24}, (_,i) => hourlyActivity[i] || 0), borderColor: '#0055aa', fill: true }] } });
+}
+
+function loadSettings() {
+    document.getElementById('mainContent').innerHTML = `
+        <h2 style="color:#0055aa; margin-bottom:20px;"><i class="fa fa-cog"></i> System Settings</h2>
+        <div style="background:white;border-radius:15px;padding:25px;margin-bottom:25px;"><h3>Data Management</h3><button class="btn btn-primary" onclick="exportData()"><i class="fa fa-download"></i> Export All Data (JSON)</button><button class="btn btn-danger" onclick="clearAllActivity()" style="margin-left:10px;"><i class="fa fa-trash"></i> Clear All Tracking Data</button></div>
+        <div style="background:white;border-radius:15px;padding:25px;"><h3>Admin Account</h3><div class="form-group"><label>Username</label><input type="text" id="adminUser" value="${escapeHtml(ADMIN_CREDENTIALS.username)}" style="width:100%;padding:10px;margin-bottom:15px;border:1px solid #ddd;border-radius:8px;"></div><div class="form-group"><label>New Password</label><input type="password" id="adminNewPass" style="width:100%;padding:10px;margin-bottom:15px;border:1px solid #ddd;border-radius:8px;"></div><div class="form-group"><label>Confirm Password</label><input type="password" id="adminConfirmPass" style="width:100%;padding:10px;margin-bottom:15px;border:1px solid #ddd;border-radius:8px;"></div><button class="btn btn-primary" onclick="saveAdminAccount()">Update Admin Account</button></div>`;
+}
+
+function calculateDuration(start,end) { if(!start||!end) return 'N/A'; const diff = Math.floor((new Date(end)-new Date(start))/1000); if(diff<60) return `${diff}s`; if(diff<3600) return `${Math.floor(diff/60)}m ${diff%60}s`; return `${Math.floor(diff/3600)}h ${Math.floor((diff%3600)/60)}m`; }
+function formatDate(dateStr) { if(!dateStr) return 'N/A'; return new Date(dateStr).toLocaleString(); }
+function escapeHtml(text) { if(!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('darkMode', isDark); const btn = document.querySelector('.dark-toggle'); if(btn) btn.innerHTML = isDark ? '<i class="fa fa-sun"></i> Light Mode' : '<i class="fa fa-moon"></i> Dark Mode'; }
+function deleteSession(sessionId) { if(confirm('Delete this session?')) { const data=getActivityData(); delete data.sessions[sessionId]; data.events=data.events.filter(e=>e.sessionId!==sessionId); saveActivityData(data); loadVisitorSessions(); trackAdminActivity('session_deleted'); } }
+function deleteAllSessions() { if(confirm('Delete ALL sessions?')) { const data=getActivityData(); data.sessions={}; data.events=[]; saveActivityData(data); loadVisitorSessions(); trackAdminActivity('all_sessions_deleted'); } }
+function clearPageViews() { if(confirm('Clear all page view data?')) { const d=getActivityData(); d.events=d.events.filter(e=>e.type!=='pageview'); saveActivityData(d); loadPageViews(); trackAdminActivity('page_views_cleared'); } }
+function clearPageView(page) { if(confirm(`Clear page views for ${page}?`)) { const d=getActivityData(); d.events=d.events.filter(e=>!(e.type==='pageview' && e.details?.page===page)); saveActivityData(d); loadPageViews(); trackAdminActivity('page_view_cleared'); } }
+function clearClicks() { if(confirm('Clear all click data?')) { const d=getActivityData(); d.events=d.events.filter(e=>e.type!=='click'); saveActivityData(d); loadClickTracking(); trackAdminActivity('clicks_cleared'); } }
+function clearClickElement(el) { if(confirm(`Clear clicks for ${el}?`)) { const d=getActivityData(); d.events=d.events.filter(e=>!(e.type==='click' && e.details?.element===el)); saveActivityData(d); loadClickTracking(); } }
+function clearForms() { if(confirm('Clear all form submissions?')) { const d=getActivityData(); d.events=d.events.filter(e=>e.type!=='form'); saveActivityData(d); loadFormSubmissions(); trackAdminActivity('forms_cleared'); } }
+function clearScrolls() { if(confirm('Clear all scroll data?')) { const d=getActivityData(); d.events=d.events.filter(e=>e.type!=='scroll'); saveActivityData(d); loadScrollDepth(); trackAdminActivity('scrolls_cleared'); } }
+function clearTimeEvents() { if(confirm('Clear all time tracking data?')) { const d=getActivityData(); d.events=d.events.filter(e=>e.type!=='time_on_page'); saveActivityData(d); loadTimeOnSite(); trackAdminActivity('time_events_cleared'); } }
+function deleteFormEntry(timestamp) { const d=getActivityData(); d.events=d.events.filter(e=>!(e.type==='form' && e.timestamp===timestamp)); saveActivityData(d); loadFormSubmissions(); }
+function clearAllActivity() { if(confirm('WARNING: Delete ALL visitor activity data?')) { const data={ sessions:{}, events:[], pageStats:{}, startTime:new Date().toISOString() }; saveActivityData(data); loadDashboard(); trackAdminActivity('all_activity_cleared'); alert('All visitor activity data cleared.'); } }
+function exportData() { const data=getActivityData(); const dataStr=JSON.stringify(data,null,2); const blob=new Blob([dataStr],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`visitor_activity_${new Date().toISOString().split('T')[0]}.json`; a.click(); URL.revokeObjectURL(url); trackAdminActivity('data_exported'); }
+function saveAdminAccount() { const newUser=document.getElementById('adminUser')?.value; const newPass=document.getElementById('adminNewPass')?.value; const confirmPass=document.getElementById('adminConfirmPass')?.value; if(newUser) ADMIN_CREDENTIALS.username=newUser; if(newPass) { if(newPass!==confirmPass) { alert('Passwords do not match'); return; } if(newPass.length<6) { alert('Password must be 6+ characters'); return; } ADMIN_CREDENTIALS.password=newPass; } localStorage.setItem('admin_creds',JSON.stringify(ADMIN_CREDENTIALS)); alert('Admin account updated! Please login again.'); trackAdminActivity('admin_account_updated'); setTimeout(()=>logout(),1500); }
+function logout() { sessionStorage.removeItem('admin_logged'); document.getElementById('dashboard').style.display='none'; document.getElementById('loginPage').style.display='flex'; document.getElementById('loginForm').reset(); }
+document.querySelectorAll('.menu-item[data-page]').forEach(item => { item.addEventListener('click', () => loadPage(item.dataset.page)); });
+if(localStorage.getItem('darkMode') === 'true') toggleDarkMode();
+if(sessionStorage.getItem('admin_logged') === 'true') { document.getElementById('loginPage').style.display='none'; document.getElementById('dashboard').style.display='block'; loadPage('dashboard'); }
+</script>
+</body>
+</html>

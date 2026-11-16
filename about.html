@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G.S Remera TSS - About Us</title>
+<link rel="icon" type="image/png" href="2.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family: Algerian, serif;
+  background: rgb(69,53,53);
+}
+
+/* HEADER */
+header{
+  background: rgb(5,203,238);
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+header img{
+  height: 80px;
+  object-fit: contain;
+}
+
+@media(max-width:768px){
+  header img{height:50px;}
+  header div{font-size:18px!important;}
+}
+
+
+/* NAV */
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: 0.3s;
+}
+
+   nav a:hover {    color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+
+    nav a.active {
+        color: chartreuse;
+        background: white;
+        border-radius: 10px;
+    }
+
+
+/* HERO */
+.page-header{
+  background:linear-gradient(135deg,#0055aa,rgb(5,203,238));
+  color:white;
+  text-align:center;
+  padding:50px 20px;
+}
+
+.page-header h1{
+  font-size:42px;
+  margin-bottom:15px;
+}
+
+.page-header p{
+  font-size:18px;
+  opacity:0.95;
+}
+
+/* ABOUT */
+.about-container{
+  max-width:1200px;
+  margin:60px auto;
+  padding:0 20px;
+}
+
+.about-section{
+  background:white;
+  border-radius:15px;
+  padding:30px;
+  margin-bottom:30px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+
+.about-section h2{
+  color:#0055aa;
+  margin-bottom:20px;
+  font-size:24px;
+  border-left:4px solid rgb(5,203,238);
+  padding-left:15px;
+}
+
+.about-section p{
+  color:#555;
+  line-height:1.6;
+  margin-bottom:15px;
+}
+
+/* GRID CARDS */
+.about-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:30px;
+  margin-top:20px;
+}
+
+.about-card{
+  text-align:center;
+  padding:25px;
+  background:#f8f9fa;
+  border-radius:12px;
+  transition:0.3s;
+}
+
+.about-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 8px 25px rgba(0,0,0,0.1);
+}
+
+.about-card i{
+  font-size:45px;
+  color:#0055aa;
+  margin-bottom:15px;
+}
+
+.about-card h3{
+  color:#0055aa;
+  margin-bottom:10px;
+  font-size:18px;
+}
+
+.about-card p{
+  color:#666;
+  font-size:14px;
+  line-height:1.5;
+}
+
+/* VALUES */
+.values-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+  margin-top:20px;
+  justify-content:center;
+}
+
+.value-tag{
+  background:linear-gradient(135deg,#0055aa,rgb(5,203,238));
+  color:white;
+  padding:10px 20px;
+  border-radius:30px;
+  font-weight:bold;
+  transition:0.3s;
+}
+
+.value-tag:hover{
+  transform:scale(1.05);
+}
+
+/* ADMIN BUTTON */
+.admin-footer-btn{
+  display:inline-block;
+  background:rgb(5,203,238);
+  color:white;
+  padding:10px 20px;
+  border-radius:30px;
+  text-decoration:none;
+  font-weight:bold;
+  font-size:14px;
+  transition:0.3s;
+  margin-top:15px;
+  border:none;
+}
+
+.admin-footer-btn:hover{
+  background:white;
+  color:rgb(5,203,238);
+  transform:scale(1.05);
+}
+
+/* FOOTER */
+footer{
+  background:rgb(5,203,238);
+  color:white;
+  padding:40px 20px;
+  margin-top:40px;
+}
+
+.footer-content{
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:30px;
+  max-width:1200px;
+  margin:auto;
+}
+
+.footer-section{
+  flex:1;
+  min-width:180px;
+}
+
+.footer-section h3{
+  margin-bottom:20px;
+  font-size:18px;
+}
+
+.footer-section a{
+  color:white;
+  text-decoration:none;
+  font-size:14px;
+  line-height:1.8;
+}
+
+.footer-section a:hover{
+  text-decoration:underline;
+}
+
+/* SOCIAL ICONS */
+.social-icons{
+  display:flex;
+  gap:12px;
+  margin-top:15px;
+  flex-wrap:wrap;
+}
+
+.icon{
+  display:inline-flex;
+  width:40px;
+  height:40px;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  color:white;
+  font-size:18px;
+  transition:0.3s;
+  text-decoration:none;
+}
+
+.fb{background:#1877f2;}
+.yt{background:#ff0000;}
+.tt{background:#000000;}
+.ig{
+  background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4);
+}
+
+.icon:hover{
+  transform:scale(1.1);
+}
+
+/* FOOTER LINE */
+hr{
+  margin:20px 0;
+  border:1px solid rgba(255,255,255,0.2);
+}
+
+.copyright{
+  text-align:center;
+  font-size:12px;
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .page-header h1{font-size:32px;}
+  .about-grid{grid-template-columns:1fr;}
+  .footer-content{
+    flex-direction:column;
+    text-align:center;
+  }
+  .social-icons{
+    justify-content:center;
+  }
+}
+</style>
+<script>
+(function(){const K='website_activity_data';function i(){if(!localStorage.getItem(K))localStorage.setItem(K,JSON.stringify({sessions:{},events:[],startTime:new Date().toISOString()}));return JSON.parse(localStorage.getItem(K));}
+function s(d){localStorage.setItem(K,JSON.stringify(d));}
+function g(){let id=sessionStorage.getItem('visitor_id');if(!id){id='s_'+Date.now()+'_'+Math.random().toString(36).substr(2,8);sessionStorage.setItem('visitor_id',id);const d=i();if(!d.sessions[id]){d.sessions[id]={id:id,startTime:new Date().toISOString(),lastActivity:new Date().toISOString(),pageViews:0,clicks:0,pages:[],userAgent:navigator.userAgent};s(d);}}return id;}
+function t(tp,d){const data=i();const sid=g();if(data.sessions[sid]){if(tp==='pageview')data.sessions[sid].pageViews++;if(tp==='click')data.sessions[sid].clicks++;data.sessions[sid].lastActivity=new Date().toISOString();}
+data.events.unshift({type:tp,details:d,page:location.pathname,timestamp:new Date().toISOString(),sessionId:sid});if(data.events.length>500)data.events.pop();s(data);}
+window.addEventListener('load',()=>t('pageview',{title:document.title,url:location.href}));
+document.addEventListener('click',(e)=>{const tg=e.target.closest('a,button,nav a,.about-card,.value-tag')||e.target;t('click',{element:tg.tagName,text:tg.innerText?.substring(0,50)});});
+console.log('✓ Tracker active');})();
+</script>
+</head>
+<body>
+<header>
+    <a href="Home.html">
+        <img src="2.png" alt="Logo" height="80">
+    </a>
+
+<nav>
+    <a href="Home.html">Home</a>
+    <a href="department.html">Department</a>
+     <a href="about.html">About</a>
+    <a href="stakeholder.html">Stakeholders</a>
+    <a href="Accounting.html">Accounting</a>
+    <a href="Marks Portal.html">Marks Portal</a>
+    <a href="event.html">Events</a>
+    <a href="contact.html">Contact</a>
+</nav>
+</header>
+
+<div class="page-header">
+    <h1><i class="fa fa-info-circle"></i> About Us</h1>
+    <p>Learn more about G.S Remera TSS - Our history, mission, and values</p>
+</div>
+
+<div class="about-container">
+    <!-- History Section -->
+    <div class="about-section">
+        <h2><i class="fa fa-history"></i> Our History</h2>
+        <p>G.S Remera TSS was established in 2015 with a vision to provide quality education to students in Rulindo District and beyond. Since our founding, we have grown from a small institution to a comprehensive educational center serving over 500 students across multiple programs.</p>
+        <p>Over the years, we have expanded our facilities, enhanced our curriculum, and built a team of dedicated educators committed to student success. Our graduates have gone on to excel in universities and careers across Rwanda and internationally.</p>
+    </div>
+
+    <!-- Mission & Vision Section -->
+    <div class="about-section">
+        <h2><i class="fa fa-bullseye"></i> Our Mission</h2>
+        <p>To provide quality education for sustainable development, empowering students with knowledge, skills, and values for lifelong success and meaningful contribution to society.</p>
+        
+        <h2 style="margin-top:25px;"><i class="fa fa-eye"></i> Our Vision</h2>
+        <p>To be a center of excellence in education, producing competent, innovative, and responsible graduates who drive national development.</p>
+    </div>
+
+    <!-- Core Values Section -->
+    <div class="about-section">
+        <h2><i class="fa fa-heart"></i> Our Core Values</h2>
+        <div class="values-list">
+            <span class="value-tag">Excellence</span>
+            <span class="value-tag">Integrity</span>
+            <span class="value-tag">Discipline</span>
+            <span class="value-tag">Respect</span>
+            <span class="value-tag">Innovation</span>
+            <span class="value-tag">Teamwork</span>
+            <span class="value-tag">Responsibility</span>
+            <span class="value-tag">Service</span>
+        </div>
+    </div>
+
+    <!-- Achievements Section -->
+    <div class="about-section">
+        <h2><i class="fa fa-chart-line"></i> Our Achievements</h2>
+        <div class="about-grid">
+            <div class="about-card">
+                <i class="fa fa-trophy"></i>
+                <h3>95% Pass Rate</h3>
+                <p>Consistently high performance in national examinations</p>
+            </div>
+            <div class="about-card">
+                <i class="fa fa-award"></i>
+                <h3>Best School Award</h3>
+                <p>Recognized as Best Technical School in Northern Province (2024)</p>
+            </div>
+            <div class="about-card">
+                <i class="fa fa-users"></i>
+                <h3>500+ Students</h3>
+                <p>Growing community of learners and achievers</p>
+            </div>
+            <div class="about-card">
+                <i class="fa fa-chalkboard-user"></i>
+                <h3>50+ Teachers</h3>
+                <p>Dedicated and qualified teaching staff</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Facilities Section - CORRECTED -->
+    <div class="about-section">
+        <h2><i class="fa fa-school"></i> Our Facilities</h2>
+        <div class="about-grid">
+            <div class="about-card">
+                <i class="fa fa-flask"></i>
+                <h3>Science Laboratories</h3>
+                <p>4 fully equipped laboratories with modern apparatus for practical learning in Physics, Chemistry, and Biology.</p>
+            </div>
+            <div class="about-card">
+                <i class="fa fa-laptop-code"></i>
+                <h3>Computer Labs</h3>
+                <p>120+ modern computers with high-speed internet access for ICT education and digital skills training.</p>
+            </div>
+            <div class="about-card">
+                <i class="fa fa-book"></i>
+                <h3>Library</h3>
+                <p>5,000+ books, journals, and digital resources for research and learning.</p>
+            </div>
+            <div class="about-card">
+                <i class="fa fa-futbol"></i>
+                <h3>Sports Facilities</h3>
+                <p>Football pitch, basketball court, volleyball court, and athletics track for physical development.</p>
+            </div>
+            <div class="about-card">
+                <i class="fa fa-chalkboard"></i>
+                <h3>Modern Classrooms</h3>
+                <p>Spacious, well-ventilated classrooms with smart boards and learning materials.</p>
+            </div>
+            <div class="about-card">
+                <i class="fa fa-bus"></i>
+                <h3>Transport Services</h3>
+                <p>School bus fleet providing safe transportation for students from surrounding areas.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <a href="Home.html"><img src="2.png" alt="Logo" height="200"></a>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="Home.html">Home</a></p>
+            <p><a href="department.html">Department</a></p>
+            <p><a href="stakeholder.html">Stakeholders</a></p>
+            <p><a href="event.html">Events</a></p>
+            <p><a href="contact.html">Contact</a></p>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fa fa-envelope"></i> busoro1972@gmail.com</p>
+            <p><i class="fa fa-phone"></i> +250782160168</p>
+            <p><i class="fa fa-map-marker-alt"></i> G.S Remera TSS, Rulindo</p>
+        </div>
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-icons">
+                <a href="https://www.facebook.com/profile.php?id=61587210833693" class="icon fb"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.youtube.com/watch?v=YRhBfL3GEjQ" class="icon yt"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.tiktok.com/@osamathelegend4" class="icon tt"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/hirwaosama10/" class="icon ig"><i class="fab fa-instagram"></i></a>
+            </div>
+            <!-- Admin Link -->
+<a href="admin.html" class="admin-link">
+    <i class="fa fa-shield-alt"></i> Admin Panel
+</a>
+        </div>
+        <div class="footer-section">
+            <h3>Location</h3>
+            <iframe src="https://www.google.com/maps?q=G.S+REMERA+TSS+Rulindo+Cyinzuzi&output=embed" style="width:200px;height:150px;border:0;border-radius:8px;"></iframe>
+        </div>
+    </div>
+    <hr>
+    <div class="copyright">
+        <p>Copyright © 2026 G.S Remera TSS | All Rights Reserved</p>
+    </div>
+</footer>
+
+</body>
+</html>
